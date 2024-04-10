@@ -9,13 +9,12 @@
 /* Begin PBXBuildFile section */
 		E9D311EE2BBDE13400F8C0E5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D311ED2BBDE13400F8C0E5 /* AppDelegate.swift */; };
 		E9D311F02BBDE13400F8C0E5 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D311EF2BBDE13400F8C0E5 /* SceneDelegate.swift */; };
-		E9D311F22BBDE13400F8C0E5 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D311F12BBDE13400F8C0E5 /* ViewController.swift */; };
-		E9D311F52BBDE13400F8C0E5 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = E9D311F42BBDE13400F8C0E5 /* Base */; };
+		E9D311F22BBDE13400F8C0E5 /* TrackerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D311F12BBDE13400F8C0E5 /* TrackerViewController.swift */; };
 		E9D311F72BBDE13600F8C0E5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E9D311F62BBDE13600F8C0E5 /* Assets.xcassets */; };
 		E9D311FA2BBDE13600F8C0E5 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = E9D311F92BBDE13600F8C0E5 /* Base */; };
-		E9D312052BBDE13600F8C0E5 /* TrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D312042BBDE13600F8C0E5 /* TrackerTests.swift */; };
-		E9D3120F2BBDE13600F8C0E5 /* TrackerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D3120E2BBDE13600F8C0E5 /* TrackerUITests.swift */; };
-		E9D312112BBDE13600F8C0E5 /* TrackerUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D312102BBDE13600F8C0E5 /* TrackerUITestsLaunchTests.swift */; };
+		E9D3121E2BBDF07C00F8C0E5 /* LaunchScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D3121D2BBDF07C00F8C0E5 /* LaunchScreenViewController.swift */; };
+		E9D312202BC4834300F8C0E5 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D3121F2BC4834300F8C0E5 /* TabBarController.swift */; };
+		E9D312222BC4846A00F8C0E5 /* StatisticViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D312212BC4846A00F8C0E5 /* StatisticViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,16 +38,15 @@
 		E9D311EA2BBDE13400F8C0E5 /* Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9D311ED2BBDE13400F8C0E5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E9D311EF2BBDE13400F8C0E5 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		E9D311F12BBDE13400F8C0E5 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		E9D311F42BBDE13400F8C0E5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		E9D311F12BBDE13400F8C0E5 /* TrackerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerViewController.swift; sourceTree = "<group>"; };
 		E9D311F62BBDE13600F8C0E5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E9D311F92BBDE13600F8C0E5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E9D311FB2BBDE13600F8C0E5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E9D312002BBDE13600F8C0E5 /* TrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		E9D312042BBDE13600F8C0E5 /* TrackerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerTests.swift; sourceTree = "<group>"; };
 		E9D3120A2BBDE13600F8C0E5 /* TrackerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		E9D3120E2BBDE13600F8C0E5 /* TrackerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerUITests.swift; sourceTree = "<group>"; };
-		E9D312102BBDE13600F8C0E5 /* TrackerUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		E9D3121D2BBDF07C00F8C0E5 /* LaunchScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchScreenViewController.swift; sourceTree = "<group>"; };
+		E9D3121F2BC4834300F8C0E5 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
+		E9D312212BC4846A00F8C0E5 /* StatisticViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,8 +78,6 @@
 			isa = PBXGroup;
 			children = (
 				E9D311EC2BBDE13400F8C0E5 /* Tracker */,
-				E9D312032BBDE13600F8C0E5 /* TrackerTests */,
-				E9D3120D2BBDE13600F8C0E5 /* TrackerUITests */,
 				E9D311EB2BBDE13400F8C0E5 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -99,32 +95,17 @@
 		E9D311EC2BBDE13400F8C0E5 /* Tracker */ = {
 			isa = PBXGroup;
 			children = (
+				E9D312212BC4846A00F8C0E5 /* StatisticViewController.swift */,
+				E9D311F12BBDE13400F8C0E5 /* TrackerViewController.swift */,
+				E9D3121F2BC4834300F8C0E5 /* TabBarController.swift */,
+				E9D3121D2BBDF07C00F8C0E5 /* LaunchScreenViewController.swift */,
 				E9D311ED2BBDE13400F8C0E5 /* AppDelegate.swift */,
 				E9D311EF2BBDE13400F8C0E5 /* SceneDelegate.swift */,
-				E9D311F12BBDE13400F8C0E5 /* ViewController.swift */,
-				E9D311F32BBDE13400F8C0E5 /* Main.storyboard */,
 				E9D311F62BBDE13600F8C0E5 /* Assets.xcassets */,
 				E9D311F82BBDE13600F8C0E5 /* LaunchScreen.storyboard */,
 				E9D311FB2BBDE13600F8C0E5 /* Info.plist */,
 			);
 			path = Tracker;
-			sourceTree = "<group>";
-		};
-		E9D312032BBDE13600F8C0E5 /* TrackerTests */ = {
-			isa = PBXGroup;
-			children = (
-				E9D312042BBDE13600F8C0E5 /* TrackerTests.swift */,
-			);
-			path = TrackerTests;
-			sourceTree = "<group>";
-		};
-		E9D3120D2BBDE13600F8C0E5 /* TrackerUITests */ = {
-			isa = PBXGroup;
-			children = (
-				E9D3120E2BBDE13600F8C0E5 /* TrackerUITests.swift */,
-				E9D312102BBDE13600F8C0E5 /* TrackerUITestsLaunchTests.swift */,
-			);
-			path = TrackerUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -233,7 +214,6 @@
 			files = (
 				E9D311F72BBDE13600F8C0E5 /* Assets.xcassets in Resources */,
 				E9D311FA2BBDE13600F8C0E5 /* Base in Resources */,
-				E9D311F52BBDE13400F8C0E5 /* Base in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -258,8 +238,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E9D311F22BBDE13400F8C0E5 /* ViewController.swift in Sources */,
+				E9D312222BC4846A00F8C0E5 /* StatisticViewController.swift in Sources */,
+				E9D311F22BBDE13400F8C0E5 /* TrackerViewController.swift in Sources */,
 				E9D311EE2BBDE13400F8C0E5 /* AppDelegate.swift in Sources */,
+				E9D3121E2BBDF07C00F8C0E5 /* LaunchScreenViewController.swift in Sources */,
+				E9D312202BC4834300F8C0E5 /* TabBarController.swift in Sources */,
 				E9D311F02BBDE13400F8C0E5 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -268,7 +251,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E9D312052BBDE13600F8C0E5 /* TrackerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -276,8 +258,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E9D3120F2BBDE13600F8C0E5 /* TrackerUITests.swift in Sources */,
-				E9D312112BBDE13600F8C0E5 /* TrackerUITestsLaunchTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -297,14 +277,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		E9D311F32BBDE13400F8C0E5 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				E9D311F42BBDE13400F8C0E5 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		E9D311F82BBDE13600F8C0E5 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -447,7 +419,6 @@
 				INFOPLIST_FILE = Tracker/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -455,7 +426,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = ru.yandex.practicum.Tracker;
+				PRODUCT_BUNDLE_IDENTIFIER = ru.PavelNi00practicum.Tracker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -475,7 +446,6 @@
 				INFOPLIST_FILE = Tracker/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -483,7 +453,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = ru.yandex.practicum.Tracker;
+				PRODUCT_BUNDLE_IDENTIFIER = ru.PavelNi00practicum.Tracker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
