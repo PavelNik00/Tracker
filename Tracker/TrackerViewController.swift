@@ -25,7 +25,6 @@ class TrackerViewController: UIViewController {
         setupSearchBar()
         
         setupNavigationBar()
-        
     }
     
     private func setupErrorImage() {
@@ -64,7 +63,7 @@ class TrackerViewController: UIViewController {
         labelTrackerTitle.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
     }
     
-    private func setupNavigationBar() {
+    func setupNavigationBar() {
         let image = UIImage(named: "icon_plus")
         
         let addButton = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(addButtonTapped))
@@ -84,7 +83,7 @@ class TrackerViewController: UIViewController {
         searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8).isActive = true
     }
     
-    @objc private func addButtonTapped() {
+    @objc func addButtonTapped() {
         print("Add button tapped")
     }
 }
