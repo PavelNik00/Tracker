@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E95415462BF6851D00562193 /* Tracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95415452BF6851D00562193 /* Tracker.swift */; };
+		E95415482BF685B800562193 /* TrackerCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95415472BF685B800562193 /* TrackerCategory.swift */; };
+		E954154A2BF6865E00562193 /* TrackerRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95415492BF6865E00562193 /* TrackerRecord.swift */; };
 		E9D311EE2BBDE13400F8C0E5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D311ED2BBDE13400F8C0E5 /* AppDelegate.swift */; };
 		E9D311F02BBDE13400F8C0E5 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D311EF2BBDE13400F8C0E5 /* SceneDelegate.swift */; };
 		E9D311F22BBDE13400F8C0E5 /* TrackerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D311F12BBDE13400F8C0E5 /* TrackerViewController.swift */; };
@@ -35,6 +38,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		E95415452BF6851D00562193 /* Tracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tracker.swift; sourceTree = "<group>"; };
+		E95415472BF685B800562193 /* TrackerCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCategory.swift; sourceTree = "<group>"; };
+		E95415492BF6865E00562193 /* TrackerRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRecord.swift; sourceTree = "<group>"; };
 		E9D311EA2BBDE13400F8C0E5 /* Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9D311ED2BBDE13400F8C0E5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E9D311EF2BBDE13400F8C0E5 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -104,6 +110,9 @@
 				E9D311F62BBDE13600F8C0E5 /* Assets.xcassets */,
 				E9D311F82BBDE13600F8C0E5 /* LaunchScreen.storyboard */,
 				E9D311FB2BBDE13600F8C0E5 /* Info.plist */,
+				E95415452BF6851D00562193 /* Tracker.swift */,
+				E95415472BF685B800562193 /* TrackerCategory.swift */,
+				E95415492BF6865E00562193 /* TrackerRecord.swift */,
 			);
 			path = Tracker;
 			sourceTree = "<group>";
@@ -240,10 +249,13 @@
 			files = (
 				E9D312222BC4846A00F8C0E5 /* StatisticViewController.swift in Sources */,
 				E9D311F22BBDE13400F8C0E5 /* TrackerViewController.swift in Sources */,
+				E95415482BF685B800562193 /* TrackerCategory.swift in Sources */,
 				E9D311EE2BBDE13400F8C0E5 /* AppDelegate.swift in Sources */,
 				E9D3121E2BBDF07C00F8C0E5 /* LaunchScreenViewController.swift in Sources */,
+				E954154A2BF6865E00562193 /* TrackerRecord.swift in Sources */,
 				E9D312202BC4834300F8C0E5 /* TabBarController.swift in Sources */,
 				E9D311F02BBDE13400F8C0E5 /* SceneDelegate.swift in Sources */,
+				E95415462BF6851D00562193 /* Tracker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

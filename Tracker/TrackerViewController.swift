@@ -9,6 +9,12 @@ import UIKit
 
 class TrackerViewController: UIViewController {
     
+    // список категорий и вложенных в них трекеров
+    var categories: [TrackerCategory] = []
+    
+    // трекеры, которые были выполнены в выбранную дату хранятся здесь
+    var completedTrackers: [TrackerRecord] = []
+    
     let errorImage = UIImageView()
     let labelQuestion = UILabel()
     let labelTrackerTitle = UILabel()
