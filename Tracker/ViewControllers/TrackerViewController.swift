@@ -7,7 +7,7 @@
 
 import UIKit
 
-class TrackerViewController: UIViewController {
+final class TrackerViewController: UIViewController {
     
     // список категорий и вложенных в них трекеров
     var categories: [TrackerCategory] = []
@@ -19,6 +19,13 @@ class TrackerViewController: UIViewController {
     let labelQuestion = UILabel()
     let labelTrackerTitle = UILabel()
     let searchBar = UISearchBar()
+    
+    let collectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .vertical
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        return collectionView
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -120,6 +127,10 @@ class TrackerViewController: UIViewController {
     }
     
     @objc func addButtonTapped() {
+        let addNewVC = ChooseTypeOfTrackerVC()
+        let addNavigationController = UINavigationController(rootViewController: addNewVC)
+        addNavigationController.modalPresentationStyle = .pageSheet
+        present(addNavigationController, animated: true)
         print("Add button tapped")
     }
 }
