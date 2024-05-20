@@ -31,6 +31,7 @@ class TrackerViewController: UIViewController {
         setupSearchBar()
         
         setupNavigationBar()
+        setupDatePicker()
     }
     
     private func setupErrorImage() {
@@ -75,6 +76,35 @@ class TrackerViewController: UIViewController {
         let addButton = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(addButtonTapped))
         addButton.tintColor = .black
         navigationItem.leftBarButtonItem = addButton
+        
+    }
+    
+    func setupDatePicker() {
+        let datePicker = UIDatePicker()
+        
+        let currentDate = Date()
+        let calendar = Calendar.current
+        let minDate = calendar.date(byAdding: .year, value: -10, to: currentDate)
+        let maxDate = calendar.date(byAdding: .year, value: 10, to: currentDate)
+        datePicker.minimumDate = minDate
+        datePicker.maximumDate = maxDate
+        
+        datePicker.datePickerMode = .date
+        datePicker.preferredDatePickerStyle = .compact
+        datePicker.calendar.locale = Locale(identifier: "ru_RU")
+        datePicker.translatesAutoresizingMaskIntoConstraints = false
+        datePicker.widthAnchor.constraint(equalToConstant: 120).isActive = true
+//        datePicker.tintColor = UIColor(named: "Blue")
+        datePicker.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .valueChanged)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: datePicker)
+    }
+    
+    @objc func datePickerValueChanged(_ sender: UIDatePicker) {
+        let selectedDate = sender.date
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd.MM.yyyy"
+        let formattedDate = dateFormatter.string(from: selectedDate)
+        print("Выбранная дата: \(formattedDate)")
     }
     
     private func setupSearchBar() {
