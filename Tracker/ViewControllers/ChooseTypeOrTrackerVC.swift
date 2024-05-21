@@ -77,6 +77,10 @@ final class ChooseTypeOfTrackerVC: UIViewController {
     }
     
     @objc func setupNewHabitButton() {
+        let addNewVC = NewHabitViewController()
+        let addNavigationController = UINavigationController(rootViewController: addNewVC)
+        addNavigationController.modalPresentationStyle = .pageSheet
+        present(addNavigationController, animated: true)
         print("Habit button tapped")
     }
     
