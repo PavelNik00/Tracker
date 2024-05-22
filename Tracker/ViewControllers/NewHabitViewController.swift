@@ -15,12 +15,10 @@ final class NewHabitViewController: UIViewController {
         return scrollView
     }()
     
-    private let contentView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.spacing = 20
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        return stackView
+    private let contentView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
     }()
     
     private let label: UILabel = {
@@ -97,47 +95,50 @@ final class NewHabitViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // задаем заголовок для экрана
+        self.title = "Новая привычка"
         view.backgroundColor = .white
         
-//        setupScrollView()
-//        setupStackView()
-        setupLabel()
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+
+        setupScrollView()
+        setupContentView()
+//        setupLabel()
         setupAddCategoryNameTextField()
-        setupButtons()
         setupTableView()
         setupEmojiCollection()
         setupColorCollection()
+        setupButtons()
     }
     
-//    func setupScrollView() {
-//        view.addSubview(scrollView)
-//        
-//        NSLayoutConstraint.activate([
-//            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-//            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-//            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
-//            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-//        ])
-//    }
-    
-//    func setupStackView() {
-//        scrollView.addSubview(contentView)
-//        
-//        NSLayoutConstraint.activate([
-//            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
-//            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
-//            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
-//        ])
-//    }
-    
-    func setupLabel() {
-        view.addSubview(label)
-        
+    func setupScrollView() {
         NSLayoutConstraint.activate([
-            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            label.topAnchor.constraint(equalTo: view.topAnchor, constant: 22),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
+    
+    func setupContentView() {
+        NSLayoutConstraint.activate([
+            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
+        ])
+    }
+    
+//    func setupLabel() {
+//        contentView.addSubview(label)
+//        
+//        NSLayoutConstraint.activate([
+//            label.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+//            label.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 22),
+//        ])
+//    }
     
     func setupAddCategoryNameTextField(){
         addCategoryNameTextField.placeholder = "Введите название трека"
@@ -151,40 +152,19 @@ final class NewHabitViewController: UIViewController {
         addCategoryNameTextField.leftViewMode = .always
         
         
-        view.addSubview(addCategoryNameTextField)
+        contentView.addSubview(addCategoryNameTextField)
         addCategoryNameTextField.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            addCategoryNameTextField.topAnchor.constraint(equalTo: view.topAnchor, constant: 60),
-            addCategoryNameTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            addCategoryNameTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            addCategoryNameTextField.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
+            addCategoryNameTextField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            addCategoryNameTextField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             addCategoryNameTextField.heightAnchor.constraint(equalToConstant: 75)])
-    }
-    
-    func setupButtons() {
-        view.addSubview(cancelButton)
-        view.addSubview(addButton)
-        
-        cancelButton.translatesAutoresizingMaskIntoConstraints = false
-        addButton.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            cancelButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -30),
-            cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            cancelButton.heightAnchor.constraint(equalToConstant: 60),
-            
-            addButton.leadingAnchor.constraint(equalTo: cancelButton.trailingAnchor, constant: 10),
-            addButton.bottomAnchor.constraint(equalTo: cancelButton.bottomAnchor),
-            addButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            addButton.heightAnchor.constraint(equalToConstant: 60),
-            
-            addButton.widthAnchor.constraint(equalTo: cancelButton.widthAnchor)
-        ])
     }
     
     func setupTableView() {
         
-        view.addSubview(tableView)
+        contentView.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         
         tableView.layer.cornerRadius = 16
@@ -197,15 +177,15 @@ final class NewHabitViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: addCategoryNameTextField.bottomAnchor, constant: 20),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            tableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            tableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             tableView.heightAnchor.constraint(equalToConstant: 150),
         ])
     }
     
     func setupEmojiCollection() {
         
-        view.addSubview(emojiCollection)
+        contentView.addSubview(emojiCollection)
         emojiCollection.translatesAutoresizingMaskIntoConstraints = false
         emojiCollection.backgroundColor = .white
         
@@ -215,8 +195,8 @@ final class NewHabitViewController: UIViewController {
         emojiCollection.delegate = self
         
         NSLayoutConstraint.activate([
-            emojiCollection.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            emojiCollection.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            emojiCollection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            emojiCollection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             emojiCollection.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 20),
             emojiCollection.heightAnchor.constraint(equalToConstant: 230)
         ])
@@ -224,7 +204,7 @@ final class NewHabitViewController: UIViewController {
     
     func setupColorCollection() {
         
-        view.addSubview(colorCollection)
+        contentView.addSubview(colorCollection)
         colorCollection.translatesAutoresizingMaskIntoConstraints = false
         colorCollection.backgroundColor = .white
         
@@ -234,12 +214,35 @@ final class NewHabitViewController: UIViewController {
         colorCollection.delegate = self
         
         NSLayoutConstraint.activate([
-            colorCollection.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            colorCollection.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            colorCollection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            colorCollection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             colorCollection.topAnchor.constraint(equalTo: emojiCollection.bottomAnchor, constant: 20),
             colorCollection.heightAnchor.constraint(equalToConstant: 230)
         ])
     }
+    
+    func setupButtons() {
+        contentView.addSubview(cancelButton)
+        contentView.addSubview(addButton)
+        
+        cancelButton.translatesAutoresizingMaskIntoConstraints = false
+        addButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            cancelButton.topAnchor.constraint(equalTo: colorCollection.bottomAnchor, constant: 30),
+            cancelButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            cancelButton.heightAnchor.constraint(equalToConstant: 60),
+            
+            addButton.leadingAnchor.constraint(equalTo: cancelButton.trailingAnchor, constant: 10),
+            addButton.topAnchor.constraint(equalTo: cancelButton.topAnchor),
+            addButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            addButton.heightAnchor.constraint(equalToConstant: 60),
+            
+            addButton.widthAnchor.constraint(equalTo: cancelButton.widthAnchor),
+            addButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -30)
+        ])
+    }
+    
     
     @objc func cancelButtonDidTap() {
         print("CancelButtonDidTap tapped")
@@ -267,6 +270,11 @@ extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
         let iconImage = UIImageView(frame: CGRect(x: 0, y: 0, width: 24, height: 24))
         iconImage.image = UIImage(named: "icon_next")
         cell.accessoryView = iconImage
+        
+        // Убираем сепаратор у последней ячейки
+        if indexPath.row == tableViewRows.count - 1 {
+            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
+        }
         
         return cell
     }
