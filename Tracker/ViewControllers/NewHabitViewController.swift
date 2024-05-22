@@ -9,6 +9,20 @@ import UIKit
 
 final class NewHabitViewController: UIViewController {
     
+    private let scrollView: UIScrollView = {
+       let scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        return scrollView
+    }()
+    
+    private let contentView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 20
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
+    
     private let label: UILabel = {
         let label = UILabel()
         label.text = "Новая привычка"
@@ -33,6 +47,25 @@ final class NewHabitViewController: UIViewController {
         layout.scrollDirection = .vertical
         let emojiCollection = UICollectionView(frame: .zero, collectionViewLayout: layout)
        return emojiCollection
+    }()
+    
+    let colorArray: [UIColor] = [
+        UIColor(named: "Color selection 1")!, UIColor(named: "Color selection 2")!,
+        UIColor(named: "Color selection 3")!, UIColor(named: "Color selection 4")!,
+        UIColor(named: "Color selection 5")!, UIColor(named: "Color selection 6")!,
+        UIColor(named: "Color selection 7")!, UIColor(named: "Color selection 8")!,
+        UIColor(named: "Color selection 9")!, UIColor(named: "Color selection 10")!,
+        UIColor(named: "Color selection 11")!, UIColor(named: "Color selection 12")!,
+        UIColor(named: "Color selection 13")!, UIColor(named: "Color selection 14")!,
+        UIColor(named: "Color selection 15")!, UIColor(named: "Color selection 16")!,
+        UIColor(named: "Color selection 17")!, UIColor(named: "Color selection 18")!,
+    ]
+    
+    let colorCollection: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .vertical
+        let colorCollection = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        return colorCollection
     }()
     
     private let cancelButton: UIButton = {
@@ -66,17 +99,44 @@ final class NewHabitViewController: UIViewController {
         
         view.backgroundColor = .white
         
+//        setupScrollView()
+//        setupStackView()
+        setupLabel()
+        setupAddCategoryNameTextField()
+        setupButtons()
+        setupTableView()
+        setupEmojiCollection()
+        setupColorCollection()
+    }
+    
+//    func setupScrollView() {
+//        view.addSubview(scrollView)
+//        
+//        NSLayoutConstraint.activate([
+//            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+//            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+//            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
+//            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+//        ])
+//    }
+    
+//    func setupStackView() {
+//        scrollView.addSubview(contentView)
+//        
+//        NSLayoutConstraint.activate([
+//            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+//            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+//            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+//        ])
+//    }
+    
+    func setupLabel() {
         view.addSubview(label)
         
         NSLayoutConstraint.activate([
             label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             label.topAnchor.constraint(equalTo: view.topAnchor, constant: 22),
         ])
-        
-        setupAddCategoryNameTextField()
-        setupButtons()
-        setupTableView()
-        setupEmojiCollection()
     }
     
     func setupAddCategoryNameTextField(){
@@ -162,6 +222,25 @@ final class NewHabitViewController: UIViewController {
         ])
     }
     
+    func setupColorCollection() {
+        
+        view.addSubview(colorCollection)
+        colorCollection.translatesAutoresizingMaskIntoConstraints = false
+        colorCollection.backgroundColor = .white
+        
+        colorCollection.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "colorCell")
+        colorCollection.register(SupplementaryView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
+        colorCollection.dataSource = self
+        colorCollection.delegate = self
+        
+        NSLayoutConstraint.activate([
+            colorCollection.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            colorCollection.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            colorCollection.topAnchor.constraint(equalTo: emojiCollection.bottomAnchor, constant: 20),
+            colorCollection.heightAnchor.constraint(equalToConstant: 230)
+        ])
+    }
+    
     @objc func cancelButtonDidTap() {
         print("CancelButtonDidTap tapped")
     }
@@ -204,38 +283,71 @@ extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
 // настройка коллекции emoji
 extension NewHabitViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
+    // настройка количесва ячеек для коллекции
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return emojiArray.count
+        if collectionView == emojiCollection {
+            emojiArray.count
+        } else {
+            colorArray.count
+        }
     }
     
     // настройка ячейки коллекции
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "emojiCell", for: indexPath) as? EmojiCollectionViewCell
-        cell?.titleLabel.text = emojiArray[indexPath.row]
-        cell?.titleLabel.font = .systemFont(ofSize: 32)
-        cell?.titleLabel.textAlignment = .center
-        cell?.contentView.backgroundColor = .white
-        return cell!
+        if collectionView == emojiCollection {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "emojiCell", for: indexPath) as? EmojiCollectionViewCell
+            cell?.titleLabel.text = emojiArray[indexPath.row]
+            cell?.titleLabel.font = .systemFont(ofSize: 32)
+            cell?.titleLabel.textAlignment = .center
+            cell?.contentView.backgroundColor = .white
+            return cell!
+        } else {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "colorCell", for: indexPath)
+            let view = UIImageView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
+            view.layer.cornerRadius = 8
+            view.backgroundColor = colorArray[indexPath.row]
+            view.layer.masksToBounds = true
+            cell.contentView.addSubview(view)
+            view.center = CGPoint(x: cell.contentView.bounds.midX,
+                                  y: cell.contentView.bounds.midY)
+            return cell
+        }
     }
     
     // настройка выделения ячейки коллекции при тапе на нее
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let cell = emojiCollection.cellForItem(at: indexPath)
-        cell?.contentView.layer.cornerRadius = 16
-        cell?.contentView.backgroundColor = UIColor(named: "Light Grey")
+        if collectionView == emojiCollection {
+            let cell = emojiCollection.cellForItem(at: indexPath)
+            cell?.contentView.layer.cornerRadius = 16
+            cell?.contentView.backgroundColor = UIColor(named: "Light Grey")
+        } else {
+            let cell = colorCollection.cellForItem(at: indexPath)
+            cell?.layer.borderWidth = 3
+            cell?.layer.cornerRadius = 8
+            cell?.layer.borderColor = colorArray[indexPath.row].cgColor
+        }
     }
     
     // настройка отмены выделения при тапе на другую ячейку в коллекции
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-        let cell = emojiCollection.cellForItem(at: indexPath) as! EmojiCollectionViewCell
-        cell.contentView.layer.cornerRadius = 0
-        cell.contentView.backgroundColor = .white
+        if collectionView == emojiCollection {
+            let cell = emojiCollection.cellForItem(at: indexPath) as! EmojiCollectionViewCell
+            cell.contentView.layer.cornerRadius = 0
+            cell.contentView.backgroundColor = .white
+        } else {
+            let cell = colorCollection.cellForItem(at: indexPath)
+            cell?.layer.borderWidth = 0
+        }
     }
     
     // настройка хедера
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        let view = emojiCollection.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header", for: indexPath) as! SupplementaryView
-        view.label.text = "Emoji"
+        let view = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header", for: indexPath) as! SupplementaryView
+        if collectionView == emojiCollection {
+            view.label.text = "Emoji"
+        } else {
+            view.label.text = "Colors"
+        }
         return view
     }
     
@@ -249,6 +361,7 @@ extension NewHabitViewController: UICollectionViewDataSource, UICollectionViewDe
         return CGSize(width: collectionView.frame.width, height: 50)
     }
     
+    // настройка отступа сверху для ячеек коллекции
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 10
     }
