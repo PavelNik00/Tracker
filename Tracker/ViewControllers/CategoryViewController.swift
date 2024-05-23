@@ -7,6 +7,7 @@
 
 import UIKit
 
+// класс для страницы Категория
 final class CategoryViewController: UIViewController {
     
     private let labelHeader: UILabel = {
@@ -49,7 +50,8 @@ final class CategoryViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             labelHeader.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            labelHeader.topAnchor.constraint(equalTo: view.topAnchor, constant: 22)])
+            labelHeader.topAnchor.constraint(equalTo: view.topAnchor, constant: 22)
+        ])
     }
     
     private func setupErrorImage() {
@@ -60,8 +62,10 @@ final class CategoryViewController: UIViewController {
         errorImage.clipsToBounds = true
         
         view.addSubview(errorImage)
-        errorImage.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        errorImage.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        NSLayoutConstraint.activate([
+            errorImage.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            errorImage.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
     }
     
     private func setuplabelText() {
@@ -75,13 +79,16 @@ final class CategoryViewController: UIViewController {
         labelText.textAlignment = .center
         
         view.addSubview(labelText)
-        labelText.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        labelText.topAnchor.constraint(equalTo: errorImage.bottomAnchor, constant: 8).isActive = true
+        NSLayoutConstraint.activate([
+            labelText.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            labelText.topAnchor.constraint(equalTo: errorImage.bottomAnchor, constant: 8)
+        ])
     }
     
     private func setupAddCategoryButton() {
         view.addSubview(buttonAddCategory)
         buttonAddCategory.translatesAutoresizingMaskIntoConstraints = false
+        buttonAddCategory.addTarget(self, action: #selector(addCategoryButton), for: .touchUpInside)
         
         NSLayoutConstraint.activate([
             buttonAddCategory.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
@@ -91,4 +98,10 @@ final class CategoryViewController: UIViewController {
         ])
     }
     
+    @objc func addCategoryButton() {
+        let navigationViewController = UINavigationController(rootViewController: NewCategoryViewController())
+        navigationViewController.modalPresentationStyle = .pageSheet
+        present(navigationViewController, animated: true)
+        print("Button \(buttonAddCategory) tapped")
+    }
 }
