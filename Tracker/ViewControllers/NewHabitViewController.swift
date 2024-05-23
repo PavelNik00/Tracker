@@ -285,6 +285,18 @@ extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         // прописываем логику при нажатии на ячейки таблицы
+        let cell = tableViewRows[indexPath.row]
+        if cell == "Категория" {
+            let navigationVC = UINavigationController(rootViewController: CategoryViewController())
+            navigationVC.modalPresentationStyle = .pageSheet
+            present(navigationVC, animated: true)
+            print("Button Категория tapped")
+        } else {
+            let navigationVC = UINavigationController(rootViewController: ScheduleViewController())
+            navigationVC.modalPresentationStyle = .pageSheet
+            present(navigationVC, animated: true)
+            print("Button Расписание tapped")
+        }
     }
 }
 
