@@ -247,11 +247,14 @@ final class NewHabitViewController: UIViewController {
     
     
     @objc func cancelButtonDidTap() {
-        print("CancelButtonDidTap tapped")
+        // закрываем экран при нажатии на кнопку "Отменить"
+        self.dismiss(animated: true, completion: nil)
+        print("Нажата кнопка Отменить")
     }
     
     @objc func addButtonDidTap() {
-        print("AddButtonDidTap tapped")
+        // прописываем создание привычки
+        print("Нажата кнопка Создать")
     }
 }
 
