@@ -29,6 +29,7 @@ final class NewCategoryViewController: UIViewController {
         textField.layer.masksToBounds = true
         textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 15, height: 75))
         textField.leftViewMode = .always
+        textField.addTarget(self, action: #selector(textFieldEditing), for: .editingChanged)
         return textField
     }()
     
@@ -40,6 +41,8 @@ final class NewCategoryViewController: UIViewController {
         button.backgroundColor = UIColor(named: "Grey")
         button.layer.cornerRadius = 16
         button.layer.masksToBounds = true
+        button.addTarget(self, action: #selector(readyButtonTapped), for: .touchUpInside)
+        button.isEnabled = false
         return button
     }()
     
@@ -86,5 +89,25 @@ final class NewCategoryViewController: UIViewController {
             readyButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -30),
             readyButton.heightAnchor.constraint(equalToConstant: 60)
         ])
+    }
+    
+    private func readyButtonIsActive() {
+        readyButton.isEnabled = true
+        readyButton.backgroundColor = .black
+    }
+    
+    private func readyButtonIsNotActive() {
+        readyButton.isEnabled = false
+        readyButton.backgroundColor = UIColor(named: "Grey")
+    }
+    
+    @objc func textFieldEditing(_ sender: UITextField) {
+        if let text = sender.text {
+            !text.isEmpty ? readyButtonIsActive() : readyButtonIsNotActive()
+        }
+    }
+    
+    @objc func readyButtonTapped(_ sender: UIButton) {
+        guard let newCategoryName = textField.text else { return }
     }
 }

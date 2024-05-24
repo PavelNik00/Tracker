@@ -17,6 +17,7 @@
 		E954157A2BFF55A300562193 /* CategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95415792BFF55A300562193 /* CategoryViewController.swift */; };
 		E954157C2BFF5C5B00562193 /* ScheduleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E954157B2BFF5C5B00562193 /* ScheduleViewController.swift */; };
 		E954157E2BFF6CFE00562193 /* NewCategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E954157D2BFF6CFE00562193 /* NewCategoryViewController.swift */; };
+		E95415802BFF9C4E00562193 /* CategoryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E954157F2BFF9C4E00562193 /* CategoryCell.swift */; };
 		E9D311EE2BBDE13400F8C0E5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D311ED2BBDE13400F8C0E5 /* AppDelegate.swift */; };
 		E9D311F02BBDE13400F8C0E5 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D311EF2BBDE13400F8C0E5 /* SceneDelegate.swift */; };
 		E9D311F22BBDE13400F8C0E5 /* TrackerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D311F12BBDE13400F8C0E5 /* TrackerViewController.swift */; };
@@ -55,6 +56,7 @@
 		E95415792BFF55A300562193 /* CategoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryViewController.swift; sourceTree = "<group>"; };
 		E954157B2BFF5C5B00562193 /* ScheduleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleViewController.swift; sourceTree = "<group>"; };
 		E954157D2BFF6CFE00562193 /* NewCategoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewCategoryViewController.swift; sourceTree = "<group>"; };
+		E954157F2BFF9C4E00562193 /* CategoryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryCell.swift; sourceTree = "<group>"; };
 		E9D311EA2BBDE13400F8C0E5 /* Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9D311ED2BBDE13400F8C0E5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E9D311EF2BBDE13400F8C0E5 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -106,8 +108,9 @@
 				E9D3121F2BC4834300F8C0E5 /* TabBarController.swift */,
 				E9D3121D2BBDF07C00F8C0E5 /* LaunchScreenViewController.swift */,
 				E95415792BFF55A300562193 /* CategoryViewController.swift */,
-				E954157B2BFF5C5B00562193 /* ScheduleViewController.swift */,
 				E954157D2BFF6CFE00562193 /* NewCategoryViewController.swift */,
+				E954157F2BFF9C4E00562193 /* CategoryCell.swift */,
+				E954157B2BFF5C5B00562193 /* ScheduleViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -276,6 +279,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E95415802BFF9C4E00562193 /* CategoryCell.swift in Sources */,
 				E954157C2BFF5C5B00562193 /* ScheduleViewController.swift in Sources */,
 				E954157E2BFF6CFE00562193 /* NewCategoryViewController.swift in Sources */,
 				E9D312222BC4846A00F8C0E5 /* StatisticViewController.swift in Sources */,

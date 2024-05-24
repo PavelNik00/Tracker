@@ -9,6 +9,8 @@ import UIKit
 
 final class NewHabitViewController: UIViewController {
     
+    var selectedDays = ""
+    
     private let scrollView: UIScrollView = {
        let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -76,7 +78,7 @@ final class NewHabitViewController: UIViewController {
         button.layer.masksToBounds = true
         button.layer.borderWidth = 1
         button.layer.borderColor = UIColor.red.cgColor
-        button.addTarget(NewHabitViewController.self, action: #selector(cancelButtonDidTap), for: .touchUpInside)
+        button.addTarget(self, action: #selector(cancelButtonDidTap), for: .touchUpInside)
         return button
     }()
     
@@ -88,7 +90,7 @@ final class NewHabitViewController: UIViewController {
         button.backgroundColor = UIColor(named: "Grey")
         button.layer.cornerRadius = 16
         button.layer.masksToBounds = true
-        button.addTarget(NewHabitViewController.self, action: #selector(addButtonDidTap), for: .touchUpInside)
+        button.addTarget(self, action: #selector(addButtonDidTap), for: .touchUpInside)
         return button
     }()
     
@@ -255,18 +257,25 @@ final class NewHabitViewController: UIViewController {
 
 // настройка таблицы
 extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
+    
+    // количиство ячеек
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return tableViewRows.count
     }
     
+    // задаем параметры для ячейки
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
         cell.textLabel?.text = tableViewRows[indexPath.row]
         cell.textLabel?.font = .systemFont(ofSize: 17, weight: .regular)
         cell.textLabel?.textColor = .black
+        cell.detailTextLabel?.font = .systemFont(ofSize: 17, weight: .regular)
+        cell.detailTextLabel?.textColor = .black
+        cell.detailTextLabel?.text = selectedDays.isEmpty ? "" : selectedDays
         cell.backgroundColor = UIColor(named: "Light Grey")?.withAlphaComponent(0.3)
         cell.selectionStyle = .none
         
+        // настройка для картинки в ячейки
         let iconImage = UIImageView(frame: CGRect(x: 0, y: 0, width: 24, height: 24))
         iconImage.image = UIImage(named: "icon_next")
         cell.accessoryView = iconImage
@@ -279,12 +288,13 @@ extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
         return cell
     }
     
+    // настраиваем высоту ячейки
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 75
     }
     
+    // прописываем логику при нажатии на ячейки таблицы
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // прописываем логику при нажатии на ячейки таблицы
         let cell = tableViewRows[indexPath.row]
         if cell == "Категория" {
             let navigationVC = UINavigationController(rootViewController: CategoryViewController())
@@ -292,8 +302,16 @@ extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
             present(navigationVC, animated: true)
             print("Button Категория tapped")
         } else {
-            let navigationVC = UINavigationController(rootViewController: ScheduleViewController())
+            let navigationVC = ScheduleViewController()
+            navigationVC.scheduleToPass = { [weak self] selectedDays in
+//                guard let self = self,
+//                let cell = tableView.cellForRow(at: indexPath) else { return }
+//                cell.detailTextLabel?.text = selectedDays
+                self?.selectedDays = selectedDays
+                tableView.reloadRows(at: [indexPath], with: .automatic)
+            }
             navigationVC.modalPresentationStyle = .pageSheet
+//            navigationController?.pushViewController(navigationVC, animated: true)
             present(navigationVC, animated: true)
             print("Button Расписание tapped")
         }

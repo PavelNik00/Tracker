@@ -10,6 +10,14 @@ import UIKit
 // класс для страницы Категория
 final class CategoryViewController: UIViewController {
     
+    var categories = [String]() {
+        didSet {
+            dataUpdated?()
+        }
+    }
+    
+    var dataUpdated: ( () -> Void )?
+    
     private let labelHeader: UILabel = {
         let label = UILabel()
         label.text = "Категория"
@@ -33,15 +41,41 @@ final class CategoryViewController: UIViewController {
         return button
     }()
     
+    let categoryTableView: UITableView = {
+        let tableView = UITableView()
+        
+        tableView.layer.cornerRadius = 16
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        tableView.register(CategoryCell.self, forCellReuseIdentifier: "CategoryCell")
+        return tableView
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         view.backgroundColor = .white
         
         setupLabelHeader()
-        setupErrorImage()
-        setuplabelText()
+        setupScreen()
         setupAddCategoryButton()
+
+    }
+    
+    private func setupCategoryTableView() {
+        view.addSubview(categoryTableView)
+        
+        categoryTableView.translatesAutoresizingMaskIntoConstraints = false
+        categoryTableView.backgroundColor = .white
+        
+        categoryTableView.dataSource = self
+        categoryTableView.delegate = self
+        
+        NSLayoutConstraint.activate([
+            categoryTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            categoryTableView.trailingAnchor.constraint(equalTo: view.leadingAnchor, constant: -16),
+            categoryTableView.topAnchor.constraint(equalTo: view.topAnchor, constant: 60),
+            categoryTableView.bottomAnchor.constraint(equalTo: buttonAddCategory.topAnchor, constant: -20)
+        ])
     }
     
     private func setupLabelHeader() {
@@ -98,10 +132,39 @@ final class CategoryViewController: UIViewController {
         ])
     }
     
+    private func setupScreen() {
+        if categories.isEmpty {
+            setupErrorImage()
+            setuplabelText()
+        } else {
+            setupCategoryTableView()
+        }
+    }
+    
     @objc func addCategoryButton() {
         let navigationViewController = UINavigationController(rootViewController: NewCategoryViewController())
         navigationViewController.modalPresentationStyle = .pageSheet
         present(navigationViewController, animated: true)
         print("Button \(buttonAddCategory) tapped")
     }
+}
+
+// настройка таблицы с созданными категориями
+extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
+    
+    // количество категорий
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        categories.count
+    }
+    
+    // настройка ячейки категории
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath) as! CategoryCell
+        cell.titleLabel.text = categories[indexPath.row]
+        cell.contentView.backgroundColor = UIColor(named: "Light Grey")?.withAlphaComponent(0.3)
+        
+        return cell
+    }
+    
+    
 }
