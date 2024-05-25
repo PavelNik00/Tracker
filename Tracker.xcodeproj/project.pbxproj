@@ -26,6 +26,7 @@
 		E9D3121E2BBDF07C00F8C0E5 /* LaunchScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D3121D2BBDF07C00F8C0E5 /* LaunchScreenViewController.swift */; };
 		E9D312202BC4834300F8C0E5 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D3121F2BC4834300F8C0E5 /* TabBarController.swift */; };
 		E9D312222BC4846A00F8C0E5 /* StatisticViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D312212BC4846A00F8C0E5 /* StatisticViewController.swift */; };
+		E9E7A5DC2C0244E900B67EB0 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = E9E7A5DB2C0244E900B67EB0 /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,6 +70,7 @@
 		E9D3121D2BBDF07C00F8C0E5 /* LaunchScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchScreenViewController.swift; sourceTree = "<group>"; };
 		E9D3121F2BC4834300F8C0E5 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		E9D312212BC4846A00F8C0E5 /* StatisticViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticViewController.swift; sourceTree = "<group>"; };
+		E9E7A5DB2C0244E900B67EB0 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +112,7 @@
 		E9D311E12BBDE13400F8C0E5 = {
 			isa = PBXGroup;
 			children = (
+				E9E7A5DB2C0244E900B67EB0 /* README.md */,
 				E9D311EC2BBDE13400F8C0E5 /* Tracker */,
 				E9D311EB2BBDE13400F8C0E5 /* Products */,
 			);
@@ -301,6 +304,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E9E7A5DC2C0244E900B67EB0 /* README.md in Resources */,
 				E9D311F72BBDE13600F8C0E5 /* Assets.xcassets in Resources */,
 				E9D311FA2BBDE13600F8C0E5 /* Base in Resources */,
 			);
