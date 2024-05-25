@@ -261,7 +261,7 @@ final class NewHabitViewController: UIViewController {
 // настройка таблицы
 extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
     
-    // количиство ячеек
+    // количtство ячеек
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return tableViewRows.count
     }
@@ -307,14 +307,10 @@ extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
         } else {
             let navigationVC = ScheduleViewController()
             navigationVC.scheduleToPass = { [weak self] selectedDays in
-//                guard let self = self,
-//                let cell = tableView.cellForRow(at: indexPath) else { return }
-//                cell.detailTextLabel?.text = selectedDays
                 self?.selectedDays = selectedDays
                 tableView.reloadRows(at: [indexPath], with: .automatic)
             }
             navigationVC.modalPresentationStyle = .pageSheet
-//            navigationController?.pushViewController(navigationVC, animated: true)
             present(navigationVC, animated: true)
             print("Button Расписание tapped")
         }
@@ -324,7 +320,7 @@ extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
 // настройка коллекции emoji
 extension NewHabitViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
-    // настройка количесва ячеек для коллекции
+    // настройка количества ячеек для коллекции
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == emojiCollection {
             emojiArray.count

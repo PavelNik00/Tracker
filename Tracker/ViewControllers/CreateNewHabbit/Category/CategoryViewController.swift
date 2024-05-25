@@ -26,7 +26,7 @@ final class CategoryViewController: UIViewController {
         label.textAlignment = .center
         return label
     }()
-    
+        
     private let errorImage = UIImageView()
     private let labelText = UILabel()
     

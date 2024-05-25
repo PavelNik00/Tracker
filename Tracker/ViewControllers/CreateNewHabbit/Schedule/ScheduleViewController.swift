@@ -9,21 +9,25 @@ import UIKit
 
 final class ScheduleViewController: UIViewController {
     
-    var arrayOfIndexes = [Int]()
+    var arrayOfIndexes = [Int]() // для хранения индексов выбранных дней недели
+    // замыкание для передачи строки с расписанием обратно в NewHabitVC
     var scheduleToPass: ( (String) -> Void )?
     
+    // скроллвью для возможности прокрутки содержимого
     private let scrollView: UIScrollView = {
        let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         return scrollView
     }()
     
+    // для содержания внутри скроллвью
     private let contentView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
+    //заголовок для вью
     private let labelHeader: UILabel = {
         let label = UILabel()
         label.text = "Расписание"
@@ -34,10 +38,13 @@ final class ScheduleViewController: UIViewController {
         return label
     }()
     
+    // массив с названиями дней недели для таблицы
     let tableViewRows = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
     
+    // таблица для отображения дней недели
     private let tableView = UITableView()
     
+    // кнопка Готово для подтверждения выбора расписания
     private let readyButton: UIButton = {
         let button = UIButton()
         button.setTitle("Готово", for: .normal)
@@ -114,26 +121,43 @@ final class ScheduleViewController: UIViewController {
     
     func setupTableView() {
         
-        contentView.addSubview(tableView)
+        view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         
         tableView.layer.cornerRadius = 16
         tableView.backgroundView?.backgroundColor = UIColor(named: "Light Grey")?.withAlphaComponent(0.3)
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
-        tableView.tableHeaderView = UIView()
+//        tableView.tableHeaderView = UIView()
         
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 60),
-            tableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            tableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: 60),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             tableView.heightAnchor.constraint(equalToConstant: 525)
         ])
     }
     
+    // метод при нажатии на кнопку Готово
+    @objc func readyButtonDidTap(_ sender: UIButton) {
+        passScheduleToCreatingTrackerVC()
+        dismiss(animated: true)
+    }
+
+    // обработка нажатия свитча
+    @objc func switchButtonChanged(_ sender: UISwitch) {
+
+        guard let cell = sender.superview as? UITableViewCell,
+              let indexPath = tableView.indexPath(for: cell) else { return }
+        let isOn = sender.isOn
+        appendOrRemoveArray(sender: isOn, indexPath: indexPath)
+        print("Switch button changed")
+    }
+    
+    // метод для добавления или удаления индекса в массиве хранения индексов дней недели
     func appendOrRemoveArray(sender: Bool, indexPath: IndexPath) {
         
         if sender == true {
@@ -143,12 +167,7 @@ final class ScheduleViewController: UIViewController {
         }
     }
     
-    @objc func readyButtonDidTap(_ sender: UIButton) {
-        passScheduleToCreatingTrackerVC()
-        dismiss(animated: true)
-    }
-
-    
+    // передаем выбранные дни недели в ячейку в NewHabitVC
     func passScheduleToCreatingTrackerVC() {
         var result = String()
         
@@ -159,6 +178,7 @@ final class ScheduleViewController: UIViewController {
             let arrayOfString = arrayOfIndexes.map { daysOfWeek[$0] }
             result = arrayOfString.joined(separator: ", ")
         }
+        
         scheduleToPass?(result)
         navigationController?.popViewController(animated: true)
     }
@@ -176,16 +196,13 @@ extension ScheduleViewController: UITableViewDelegate, UITableViewDataSource {
         cell.textLabel?.font = .systemFont(ofSize: 17, weight: .regular)
         cell.textLabel?.textColor = .black
         cell.backgroundColor = UIColor(named: "Light Grey")?.withAlphaComponent(0.3)
-        cell.selectionStyle = .none
-        
-        let switchButton = UISwitch()
-//        switchButton.setOn(false, animated: true)
-        switchButton.onTintColor = UIColor.blue
-        switchButton.addTarget(self, action: #selector(switchButtonChanged(_:)), for: .valueChanged)
+
+        let switchButton = UISwitch(frame: .zero)
+        switchButton.onTintColor = UIColor(named: "Blue")
+        switchButton.addTarget(self, action: #selector(switchButtonChanged), for: .valueChanged)
         switchButton.tag = indexPath.row
         cell.accessoryView = switchButton
-        
-        switchButton.isOn = arrayOfIndexes.contains(indexPath.row)
+        cell.selectionStyle = .none
         
         // Убираем сепаратор у последней ячейки
         if indexPath.row == tableViewRows.count - 1 {
@@ -198,26 +215,5 @@ extension ScheduleViewController: UITableViewDelegate, UITableViewDataSource {
     // настраиваем высоту ячейки
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 75
-    }
-    
-    @objc func switchButtonChanged(_ sender: UISwitch) {
-        let indexPathRow = sender.tag
-        let isOn = sender.isOn
-        
-        if isOn {
-            if !arrayOfIndexes.contains(indexPathRow) {
-                arrayOfIndexes.append(indexPathRow)
-            }
-        } else {
-            if let index = arrayOfIndexes.firstIndex(of: indexPathRow) {
-                arrayOfIndexes.remove(at: index)
-            }
-        }
-        
-//        guard let cell = sender.superview as? UITableViewCell,
-//        let indexPath = tableView.indexPath(for: cell) else { return }
-//        let isOn = sender.isOn
-//        appendOrRemoveArray(sender: isOn, indexPath: indexPath)
-        print("Switch button changed")
     }
 }
