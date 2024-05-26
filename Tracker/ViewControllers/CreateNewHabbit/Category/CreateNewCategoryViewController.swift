@@ -7,8 +7,24 @@
 
 import UIKit
 
+protocol CreateNewCategoryViewControllerDelegate: AnyObject {
+    func didCreatedCategory(_ createdCategory: TrackerCategory)
+}
+
 // класс для создания новой категории
-final class NewCategoryViewController: UIViewController {
+final class CreateNewCategoryViewController: UIViewController, UITextFieldDelegate {
+        
+    weak var delegate: CreateNewCategoryViewControllerDelegate?
+    var onDismiss: (() -> Void)?
+    
+    convenience init(delegate: CreateNewCategoryViewControllerDelegate) {
+        self.init()
+        self.delegate = delegate
+    }
+    
+    private var category: TrackerCategory?
+    private var categories: [TrackerCategory] = []
+    private var enteredText: String = ""
     
     private let labelHeader: UILabel = {
         let label = UILabel()
@@ -19,7 +35,7 @@ final class NewCategoryViewController: UIViewController {
         return label
     }()
     
-    private let textField: UITextField = {
+    private let newCategoryTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "Введите название категории"
         textField.font = .systemFont(ofSize: 17, weight: .regular)
@@ -29,7 +45,7 @@ final class NewCategoryViewController: UIViewController {
         textField.layer.masksToBounds = true
         textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 15, height: 75))
         textField.leftViewMode = .always
-        textField.addTarget(self, action: #selector(textFieldEditing), for: .editingChanged)
+        textField.addTarget(self, action: #selector(textFieldEditing(_:)), for: .editingChanged)
         return textField
     }()
     
@@ -41,7 +57,7 @@ final class NewCategoryViewController: UIViewController {
         button.backgroundColor = UIColor(named: "Grey")
         button.layer.cornerRadius = 16
         button.layer.masksToBounds = true
-        button.addTarget(self, action: #selector(readyButtonTapped), for: .touchUpInside)
+        button.addTarget(self, action: #selector(createCategoryButton), for: .touchUpInside)
         button.isEnabled = false
         return button
     }()
@@ -50,6 +66,8 @@ final class NewCategoryViewController: UIViewController {
         super.viewDidLoad()
         
         view.backgroundColor = .white
+        
+        newCategoryTextField.delegate = self
         
         setupLabelHeader()
         setupTextField()
@@ -67,14 +85,14 @@ final class NewCategoryViewController: UIViewController {
     }
     
     func setupTextField() {
-        view.addSubview(textField)
-        textField.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(newCategoryTextField)
+        newCategoryTextField.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            textField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            textField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            textField.topAnchor.constraint(equalTo: view.topAnchor, constant: 80),
-            textField.heightAnchor.constraint(equalToConstant: 75)
+            newCategoryTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            newCategoryTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            newCategoryTextField.topAnchor.constraint(equalTo: view.topAnchor, constant: 80),
+            newCategoryTextField.heightAnchor.constraint(equalToConstant: 75)
         ])
     }
     
@@ -91,6 +109,12 @@ final class NewCategoryViewController: UIViewController {
         ])
     }
     
+    @objc func textFieldEditing(_ textField: UITextField) {
+        if let enteredText = textField.text {
+            !enteredText.isEmpty ? readyButtonIsActive() : readyButtonIsNotActive()
+        }
+    }
+    
     private func readyButtonIsActive() {
         readyButton.isEnabled = true
         readyButton.backgroundColor = .black
@@ -101,13 +125,18 @@ final class NewCategoryViewController: UIViewController {
         readyButton.backgroundColor = UIColor(named: "Grey")
     }
     
-    @objc func textFieldEditing(_ sender: UITextField) {
-        if let text = sender.text {
-            !text.isEmpty ? readyButtonIsActive() : readyButtonIsNotActive()
+    // обрабатываем нажатие кнопки Готово
+    @objc func createCategoryButton() {
+        guard let newCategoryName = newCategoryTextField.text, !newCategoryName.isEmpty else { return }
+        
+        let newCategory = TrackerCategory(header: newCategoryName, trackers: nil)
+        self.categories.append(newCategory)
+        
+        delegate?.didCreatedCategory(newCategory)
+        
+        dismiss(animated: true) {
+            self.onDismiss?()
         }
-    }
-    
-    @objc func readyButtonTapped(_ sender: UIButton) {
-        guard let newCategoryName = textField.text else { return }
+        print(" ✅ Новая категория \(newCategoryName) создана")
     }
 }

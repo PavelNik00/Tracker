@@ -7,16 +7,23 @@
 
 import UIKit
 
+protocol CategoryViewControllerDelegate: AnyObject {
+    func didSelectCategory(_ selectedCategory: String?)
+}
+
 // класс для страницы Категория
-final class CategoryViewController: UIViewController {
+final class CategoryViewController: UIViewController, CreateNewCategoryViewControllerDelegate {
+        
+    weak var delegate: CategoryViewControllerDelegate?
+    var categoryToPass: ( (String) -> Void )?
+    var categories: [TrackerCategory] = []
     
-    var categories = [String]() {
-        didSet {
-            dataUpdated?()
-        }
-    }
+    var selectedIndexPath: IndexPath?
+    var selectedCategory: String?
     
     var dataUpdated: ( () -> Void )?
+    
+    private var isCheckmarkImageSelected: Bool = false
     
     private let labelHeader: UILabel = {
         let label = UILabel()
@@ -41,14 +48,7 @@ final class CategoryViewController: UIViewController {
         return button
     }()
     
-    let categoryTableView: UITableView = {
-        let tableView = UITableView()
-        
-        tableView.layer.cornerRadius = 16
-        tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-        tableView.register(CategoryCell.self, forCellReuseIdentifier: "CategoryCell")
-        return tableView
-    }()
+    let categoryTableView = UITableView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -63,6 +63,12 @@ final class CategoryViewController: UIViewController {
     
     private func setupCategoryTableView() {
         view.addSubview(categoryTableView)
+
+        categoryTableView.layer.cornerRadius = 16
+        categoryTableView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        categoryTableView.clipsToBounds = true
+        categoryTableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        categoryTableView.register(CategoryCell.self, forCellReuseIdentifier: "CategoryCell")
         
         categoryTableView.translatesAutoresizingMaskIntoConstraints = false
         categoryTableView.backgroundColor = .white
@@ -70,11 +76,12 @@ final class CategoryViewController: UIViewController {
         categoryTableView.dataSource = self
         categoryTableView.delegate = self
         
+        
         NSLayoutConstraint.activate([
             categoryTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            categoryTableView.trailingAnchor.constraint(equalTo: view.leadingAnchor, constant: -16),
+            categoryTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             categoryTableView.topAnchor.constraint(equalTo: view.topAnchor, constant: 60),
-            categoryTableView.bottomAnchor.constraint(equalTo: buttonAddCategory.topAnchor, constant: -20)
+            categoryTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 100)
         ])
     }
     
@@ -136,16 +143,53 @@ final class CategoryViewController: UIViewController {
         if categories.isEmpty {
             setupErrorImage()
             setuplabelText()
+            setupAddCategoryButton()
         } else {
             setupCategoryTableView()
+            setupAddCategoryButton()
+        }
+    }
+    
+    func passCategoryToCreatingTrackerVC(selectedCategory: String) {
+        
+        let trackerCategory = TrackerCategory(header: selectedCategory, trackers: nil)
+        categories.append(trackerCategory)
+        setupCategoryTableView()
+        categoryToPass?(trackerCategory.header)
+//        navigationController?.popViewController(animated: true)
+
+        if let navigationController = self.navigationController {
+            navigationController.popViewController(animated: true)
+        } else {
+            dismiss(animated: true ) { [weak self ] in
+                guard (self?.categories) != nil else { return }
+                self?.delegate?.didSelectCategory(selectedCategory)
+            }
         }
     }
     
     @objc func addCategoryButton() {
-        let navigationViewController = UINavigationController(rootViewController: NewCategoryViewController())
-        navigationViewController.modalPresentationStyle = .pageSheet
-        present(navigationViewController, animated: true)
-        print("Button \(buttonAddCategory) tapped")
+ 
+        if isCheckmarkImageSelected == true {
+                guard let selectedCategory = selectedCategory else { return }
+                passCategoryToCreatingTrackerVC(selectedCategory: selectedCategory)
+            print("Button Готово tapped")
+        } else {
+            let createNewCategoryVC = CreateNewCategoryViewController()
+            createNewCategoryVC.delegate = self
+            let navigationViewController = UINavigationController(rootViewController: createNewCategoryVC)
+            navigationViewController.modalPresentationStyle = .pageSheet
+            present(navigationViewController, animated: true)
+            print("Button Добавить категорию tapped")
+        }
+    }
+    
+    func didCreatedCategory(_ createdCategory: TrackerCategory) {
+        categories.append(createdCategory)
+        setupScreen()
+        delegate?.didSelectCategory(selectedCategory)
+        categoryTableView.reloadData()
+        dataUpdated?()
     }
 }
 
@@ -160,10 +204,45 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
     // настройка ячейки категории
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath) as! CategoryCell
-        cell.titleLabel.text = categories[indexPath.row]
-        cell.contentView.backgroundColor = UIColor(named: "Light Grey")?.withAlphaComponent(0.3)
+        cell.categoryLabel.text = categories[indexPath.row].header
+        cell.backgroundColor = UIColor(named: "Light Grey")?.withAlphaComponent(0.3)
+        
+        if indexPath == selectedIndexPath {
+            cell.checkmarkImage.isHidden = false
+        } else {
+            cell.checkmarkImage.isHidden = true
+        }
         
         return cell
+    }
+    
+    // настройка ячейки при ее выделении
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        // установка чекмарка на ячейке
+        if let selectedIndexPath = selectedIndexPath,
+        let selectedCell = tableView.cellForRow(at: selectedIndexPath) as? CategoryCell {
+            selectedCell.checkmarkImage.isHidden = true
+            updateCategoryButtonTitle()
+            tableView.reloadData()
+        }
+        
+        // установка чекмарка но новой ячейке
+        if let cell = tableView.cellForRow(at: indexPath) as? CategoryCell {
+            cell.checkmarkImage.isHidden = false
+            isCheckmarkImageSelected = !cell.checkmarkImage.isHidden
+            selectedIndexPath = indexPath
+            selectedCategory = categories[indexPath.row].header
+            updateCategoryButtonTitle()
+            tableView.reloadData()
+        }
+    }
+    
+    // обновление кнопки Готово
+    private func updateCategoryButtonTitle() {
+        let categoryButton = view.subviews.compactMap { $0 as? UIButton }.first
+        categoryButton?.setTitle(isCheckmarkImageSelected ? "Готово" : "Добавить категорию", for: .normal)
     }
     
     

@@ -7,9 +7,23 @@
 
 import UIKit
 
-final class NewHabitViewController: UIViewController {
+final class NewHabitViewController: UIViewController, CategoryViewControllerDelegate {
     
+    weak var addCategoryDelegate: CategoryViewControllerDelegate?
+
     var selectedDays = ""
+    
+    var selectedCategory = ""
+    
+    var selectedCategoryStringForHabit: String?
+    
+    private let categoryLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 16, weight: .medium)
+        label.textColor = .black
+        label.textAlignment = .left
+        return label 
+    }()
     
     private let scrollView: UIScrollView = {
        let scrollView = UIScrollView()
@@ -245,6 +259,10 @@ final class NewHabitViewController: UIViewController {
         ])
     }
     
+    func didSelectCategory(_ selectedCategory: String?) {
+        self.selectedCategoryStringForHabit = selectedCategory
+        tableView.reloadData()
+    }
     
     @objc func cancelButtonDidTap() {
         // закрываем экран при нажатии на кнопку "Отменить"
@@ -268,27 +286,51 @@ extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
     
     // задаем параметры для ячейки
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
-        cell.textLabel?.text = tableViewRows[indexPath.row]
-        cell.textLabel?.font = .systemFont(ofSize: 17, weight: .regular)
-        cell.textLabel?.textColor = .black
-        cell.detailTextLabel?.font = .systemFont(ofSize: 17, weight: .regular)
-        cell.detailTextLabel?.textColor = .black
-        cell.detailTextLabel?.text = selectedDays.isEmpty ? "" : selectedDays
-        cell.backgroundColor = UIColor(named: "Light Grey")?.withAlphaComponent(0.3)
-        cell.selectionStyle = .none
-        
-        // настройка для картинки в ячейки
-        let iconImage = UIImageView(frame: CGRect(x: 0, y: 0, width: 24, height: 24))
-        iconImage.image = UIImage(named: "icon_next")
-        cell.accessoryView = iconImage
-        
-        // Убираем сепаратор у последней ячейки
-        if indexPath.row == tableViewRows.count - 1 {
-            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
+        let cell = tableViewRows[indexPath.row]
+        if cell == "Категория" {
+            let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "CategoryCell")
+            cell.textLabel?.text = tableViewRows[indexPath.row]
+            cell.textLabel?.font = .systemFont(ofSize: 17, weight: .regular)
+            cell.textLabel?.textColor = .black
+            cell.detailTextLabel?.font = .systemFont(ofSize: 17, weight: .regular)
+            cell.detailTextLabel?.textColor = .black
+            cell.detailTextLabel?.text = selectedCategory.isEmpty ? "" : selectedCategory
+            cell.backgroundColor = UIColor(named: "Light Grey")?.withAlphaComponent(0.3)
+            cell.selectionStyle = .none
+            
+            // настройка для картинки в ячейки
+            let iconImage = UIImageView(frame: CGRect(x: 0, y: 0, width: 24, height: 24))
+            iconImage.image = UIImage(named: "icon_next")
+            cell.accessoryView = iconImage
+            
+            // Убираем сепаратор у последней ячейки
+            if indexPath.row == tableViewRows.count - 1 {
+                cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
+                
+            }
+            return cell
+        } else {
+            let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
+            cell.textLabel?.text = tableViewRows[indexPath.row]
+            cell.textLabel?.font = .systemFont(ofSize: 17, weight: .regular)
+            cell.textLabel?.textColor = .black
+            cell.detailTextLabel?.font = .systemFont(ofSize: 17, weight: .regular)
+            cell.detailTextLabel?.textColor = .black
+            cell.detailTextLabel?.text = selectedDays.isEmpty ? "" : selectedDays
+            cell.backgroundColor = UIColor(named: "Light Grey")?.withAlphaComponent(0.3)
+            cell.selectionStyle = .none
+            
+            // настройка для картинки в ячейки
+            let iconImage = UIImageView(frame: CGRect(x: 0, y: 0, width: 24, height: 24))
+            iconImage.image = UIImage(named: "icon_next")
+            cell.accessoryView = iconImage
+            
+            // Убираем сепаратор у последней ячейки
+            if indexPath.row == tableViewRows.count - 1 {
+                cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
+            }
+            return cell
         }
-        
-        return cell
     }
     
     // настраиваем высоту ячейки
@@ -300,7 +342,11 @@ extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let cell = tableViewRows[indexPath.row]
         if cell == "Категория" {
-            let navigationVC = UINavigationController(rootViewController: CategoryViewController())
+            let navigationVC = CategoryViewController()
+            navigationVC.categoryToPass = { [weak self]  selectedCategory in
+                self?.selectedCategory = selectedCategory
+                tableView.reloadRows(at: [indexPath], with: .automatic)
+            }
             navigationVC.modalPresentationStyle = .pageSheet
             present(navigationVC, animated: true)
             print("Button Категория tapped")
