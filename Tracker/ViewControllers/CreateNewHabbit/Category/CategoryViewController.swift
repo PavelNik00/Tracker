@@ -64,10 +64,10 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
     private func setupCategoryTableView() {
         view.addSubview(categoryTableView)
 
-        categoryTableView.layer.cornerRadius = 16
-        categoryTableView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner]
-        categoryTableView.clipsToBounds = true
-        categoryTableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+//        categoryTableView.layer.cornerRadius = 16
+//        categoryTableView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+//        categoryTableView.clipsToBounds = true
+//        categoryTableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         categoryTableView.register(CategoryCell.self, forCellReuseIdentifier: "CategoryCell")
         
         categoryTableView.translatesAutoresizingMaskIntoConstraints = false
@@ -154,9 +154,9 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
         
         let trackerCategory = TrackerCategory(header: selectedCategory, trackers: nil)
         categories.append(trackerCategory)
-        setupCategoryTableView()
         categoryToPass?(trackerCategory.header)
 //        navigationController?.popViewController(animated: true)
+        setupCategoryTableView()
 
         if let navigationController = self.navigationController {
             navigationController.popViewController(animated: true)
@@ -171,8 +171,8 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
     @objc func addCategoryButton() {
  
         if isCheckmarkImageSelected == true {
-                guard let selectedCategory = selectedCategory else { return }
-                passCategoryToCreatingTrackerVC(selectedCategory: selectedCategory)
+            guard let selectedCategory = selectedCategory else { return }
+            passCategoryToCreatingTrackerVC(selectedCategory: selectedCategory)
             print("Button Готово tapped")
         } else {
             let createNewCategoryVC = CreateNewCategoryViewController()
@@ -186,6 +186,10 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
     
     func didCreatedCategory(_ createdCategory: TrackerCategory) {
         categories.append(createdCategory)
+        
+        let newIndexPath = IndexPath(row: categories.count - 1, section: 0)
+        categoryTableView.insertRows(at: [newIndexPath], with: .automatic)
+        
         setupScreen()
         delegate?.didSelectCategory(selectedCategory)
         categoryTableView.reloadData()
@@ -211,6 +215,44 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
             cell.checkmarkImage.isHidden = false
         } else {
             cell.checkmarkImage.isHidden = true
+        }
+         
+        // реализация добавления ячеек в таблиц
+        tableView.separatorStyle = .singleLine
+        cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        
+        if categories.count == 1 {
+            if indexPath.row == 0 {
+                cell.layer.cornerRadius = 16
+                tableView.separatorStyle = .none
+            }
+        } else if categories.count == 2 {
+            if indexPath.row == 0 {
+                cell.layer.cornerRadius = 16
+                cell.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+                tableView.separatorStyle = .singleLine
+                cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+            } else {
+                if indexPath.row == 1 {
+                    cell.layer.cornerRadius = 16
+                    cell.layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
+                    cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
+                }
+            }
+        } else {
+            if indexPath.row == 0 {
+                cell.layer.cornerRadius = 16
+                cell.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+                tableView.separatorStyle = .singleLine
+                cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+            } else if indexPath.row == 1 {
+                cell.layer.cornerRadius = 0
+                cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+            } else if indexPath.row == 2 {
+                cell.layer.cornerRadius = 16
+                cell.layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
+                cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
+            }
         }
         
         return cell
