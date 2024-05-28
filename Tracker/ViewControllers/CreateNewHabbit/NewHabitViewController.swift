@@ -11,9 +11,15 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
     
     weak var addCategoryDelegate: CategoryViewControllerDelegate?
 
+    var selectedHabitName: [Tracker]? = []
+    
     var selectedDays = ""
     
     var selectedCategory = ""
+    
+    var selectedEmoji: String?
+    
+    var selectedColor: UIColor?
     
     var selectedCategoryStringForHabit: String?
     
@@ -126,6 +132,7 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         setupEmojiCollection()
         setupColorCollection()
         setupButtons()
+        updateCreateButtonState()
     }
     
     func setupScrollView() {
@@ -166,6 +173,7 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         addCategoryNameTextField.layer.cornerRadius = 16
         addCategoryNameTextField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 75))
         addCategoryNameTextField.leftViewMode = .always
+        addCategoryNameTextField.addTarget(self, action: #selector(addCategoryNameTextFieldEditing(_:)), for: .editingChanged)
         
         
         contentView.addSubview(addCategoryNameTextField)
@@ -259,27 +267,53 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         ])
     }
     
+    // метод для обновления выбранной категории
     func didSelectCategory(_ selectedCategory: String?) {
         self.selectedCategoryStringForHabit = selectedCategory
         tableView.reloadData()
+        updateCreateButtonState()
     }
     
+    // метод для активации кнопки "Создать" для привычки
+    func updateCreateButtonState() {
+        guard !selectedCategory.isEmpty ,
+              !selectedDays.isEmpty,
+              let selectedEmoji = selectedEmoji,
+              let selectedColor = selectedColor,
+              addCategoryNameTextField.text?.isEmpty == false
+        else {
+            addButton.isEnabled = false
+            return
+        }
+        addButton.isEnabled = true
+        addButton.backgroundColor = .black
+    }
+    
+    // обработка нажатия TextField
+    @objc func addCategoryNameTextFieldEditing(_ textField: UITextField) {
+        guard let enteredText = textField.text, !enteredText.isEmpty else { return }
+        updateCreateButtonState()
+    }
+    
+    // обработка нажатия кнопки "Отменить"
     @objc func cancelButtonDidTap() {
-        // закрываем экран при нажатии на кнопку "Отменить"
+        // закрываем экран
         self.dismiss(animated: true, completion: nil)
         print("Нажата кнопка Отменить")
     }
     
+    // обработка нажатия кнопки "Создать" для привычки
     @objc func addButtonDidTap() {
         // прописываем создание привычки
-        print("Нажата кнопка Создать")
+        print("✅ Новая привычка \(addCategoryNameTextField.text ?? "") создана")
     }
+    
 }
 
 // настройка таблицы
 extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
     
-    // количtство ячеек
+    // количество ячеек
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return tableViewRows.count
     }
@@ -308,6 +342,8 @@ extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
                 cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
                 
             }
+            
+            updateCreateButtonState()
             return cell
         } else {
             let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
@@ -329,6 +365,7 @@ extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
             if indexPath.row == tableViewRows.count - 1 {
                 cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
             }
+            updateCreateButtonState()
             return cell
         }
     }
@@ -346,6 +383,7 @@ extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
             navigationVC.categoryToPass = { [weak self]  selectedCategory in
                 self?.selectedCategory = selectedCategory
                 tableView.reloadRows(at: [indexPath], with: .automatic)
+                print("Категория добавлена в таблицу")
             }
             navigationVC.modalPresentationStyle = .pageSheet
             present(navigationVC, animated: true)
@@ -383,6 +421,7 @@ extension NewHabitViewController: UICollectionViewDataSource, UICollectionViewDe
             cell?.titleLabel.font = .systemFont(ofSize: 32)
             cell?.titleLabel.textAlignment = .center
             cell?.contentView.backgroundColor = .white
+            
             return cell!
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "colorCell", for: indexPath)
@@ -403,11 +442,17 @@ extension NewHabitViewController: UICollectionViewDataSource, UICollectionViewDe
             let cell = emojiCollection.cellForItem(at: indexPath)
             cell?.contentView.layer.cornerRadius = 16
             cell?.contentView.backgroundColor = UIColor(named: "Light Grey")
+            // выбор ячейки с емодзи
+            selectedEmoji = emojiArray[indexPath.row]
+            updateCreateButtonState()
         } else {
             let cell = colorCollection.cellForItem(at: indexPath)
             cell?.layer.borderWidth = 3
             cell?.layer.cornerRadius = 8
             cell?.layer.borderColor = colorArray[indexPath.row].cgColor
+            // выбор ячейки с цветом
+            selectedColor = colorArray[indexPath.row]
+            updateCreateButtonState()
         }
     }
     
@@ -417,9 +462,19 @@ extension NewHabitViewController: UICollectionViewDataSource, UICollectionViewDe
             let cell = emojiCollection.cellForItem(at: indexPath) as! EmojiCollectionViewCell
             cell.contentView.layer.cornerRadius = 0
             cell.contentView.backgroundColor = .white
+            
+            if selectedEmoji == emojiArray[indexPath.row] {
+                selectedEmoji = nil
+            }
+            updateCreateButtonState()
         } else {
             let cell = colorCollection.cellForItem(at: indexPath)
             cell?.layer.borderWidth = 0
+            
+            if selectedColor == colorArray[indexPath.row] {
+                selectedColor = nil
+            }
+            updateCreateButtonState()
         }
     }
     

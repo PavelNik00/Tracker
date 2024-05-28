@@ -14,4 +14,12 @@ struct Tracker {
     let color: String
     let emoji: String
     let schedule: String
+    
+    init(id: UUID, name: String, color: String, emoji: String, schedule: String) {
+        self.id = id
+        self.name = name
+        self.color = color
+        self.emoji = emoji
+        self.schedule = schedule
+    }
 }
