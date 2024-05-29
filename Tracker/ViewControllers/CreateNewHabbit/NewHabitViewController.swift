@@ -23,6 +23,18 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
     
     var selectedCategoryStringForHabit: String?
     
+    private var tableViewTopConstraint: NSLayoutConstraint?
+    
+    let limitTextLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Ограничение 38 символов"
+        label.font = .systemFont(ofSize: 17, weight: .regular)
+        label.textColor = .red
+        label.textAlignment = .center
+        label.isHidden = true
+       return label
+    }()
+    
     private let categoryLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 16, weight: .medium)
@@ -126,13 +138,24 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
 
         setupScrollView()
         setupContentView()
+        
 //        setupLabel()
         setupAddCategoryNameTextField()
+        setuplimitTextLabel()
+        
         setupTableView()
         setupEmojiCollection()
         setupColorCollection()
         setupButtons()
         updateCreateButtonState()
+        
+        // добавляем наблюдатель для свойства hidden у лейбла
+        limitTextLabel.addObserver(self, forKeyPath: "hidden", options: [.old, .new], context: nil)
+    }
+    
+    // необходим чтобы избежать утечек памяти (при деинициализации контроллера)
+    deinit {
+        limitTextLabel.removeObserver(self, forKeyPath: "hidden")
     }
     
     func setupScrollView() {
@@ -163,6 +186,16 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
 //        ])
 //    }
     
+    func setuplimitTextLabel() {
+        contentView.addSubview(limitTextLabel)
+        limitTextLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            limitTextLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            limitTextLabel.topAnchor.constraint(equalTo: addCategoryNameTextField.bottomAnchor, constant: 10)
+        ])
+    }
+    
     func setupAddCategoryNameTextField(){
         addCategoryNameTextField.placeholder = "Введите название трека"
         addCategoryNameTextField.font = .systemFont(ofSize: 17, weight: .regular)
@@ -173,6 +206,8 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         addCategoryNameTextField.layer.cornerRadius = 16
         addCategoryNameTextField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 75))
         addCategoryNameTextField.leftViewMode = .always
+        addCategoryNameTextField.clearButtonMode = .whileEditing
+        addCategoryNameTextField.delegate = self
         addCategoryNameTextField.addTarget(self, action: #selector(addCategoryNameTextFieldEditing(_:)), for: .editingChanged)
         
         
@@ -199,12 +234,17 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         tableView.delegate = self
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         
-        NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: addCategoryNameTextField.bottomAnchor, constant: 20),
-            tableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            tableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            tableView.heightAnchor.constraint(equalToConstant: 150),
-        ])
+        tableViewTopConstraint = tableView.topAnchor.constraint(equalTo: addCategoryNameTextField.bottomAnchor, constant: limitTextLabel.isHidden ? 20 : 60)
+        tableViewTopConstraint?.isActive = true
+        
+        if limitTextLabel.isHidden == true {
+            NSLayoutConstraint.activate([
+//                tableView.topAnchor.constraint(equalTo: addCategoryNameTextField.bottomAnchor, constant: 20),
+                tableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+                tableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+                tableView.heightAnchor.constraint(equalToConstant: 150),
+            ])
+        }
     }
     
     func setupEmojiCollection() {
@@ -308,6 +348,36 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         print("✅ Новая привычка \(addCategoryNameTextField.text ?? "") создана")
     }
     
+    // метод для наблюдателя
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == "hidden", let label = object as? UILabel {
+            tableViewTopConstraint?.constant = label.isHidden ? 20 : 60
+        }
+        UIView.animate(withDuration: 0.3) {
+            self.view.layoutIfNeeded()
+        }
+    }
+    
+}
+
+// настраиваем textField
+extension NewHabitViewController: UITextFieldDelegate {
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        guard let text = textField.text else { return true }
+        // вычисляем предполагаемый текст
+        let newText = (text as NSString).replacingCharacters(in: range, with: string)
+                
+        if newText.count <= 37 {
+            limitTextLabel.isHidden = true
+            textField.textColor = .black
+        } else {
+            limitTextLabel.isHidden = false
+            textField.textColor = .red
+        }
+        
+        return newText.count <= 38
+    }
 }
 
 // настройка таблицы

@@ -87,6 +87,8 @@ final class CreateNewCategoryViewController: UIViewController, UITextFieldDelega
     func setupTextField() {
         view.addSubview(newCategoryTextField)
         newCategoryTextField.translatesAutoresizingMaskIntoConstraints = false
+        newCategoryTextField.clearButtonMode = .whileEditing
+
         
         NSLayoutConstraint.activate([
             newCategoryTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
