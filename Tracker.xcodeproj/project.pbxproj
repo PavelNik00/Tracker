@@ -27,6 +27,8 @@
 		E9D312202BC4834300F8C0E5 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D3121F2BC4834300F8C0E5 /* TabBarController.swift */; };
 		E9D312222BC4846A00F8C0E5 /* StatisticViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D312212BC4846A00F8C0E5 /* StatisticViewController.swift */; };
 		E9E7A5DC2C0244E900B67EB0 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = E9E7A5DB2C0244E900B67EB0 /* README.md */; };
+		E9E7A5DE2C0733D800B67EB0 /* TrackerCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7A5DD2C0733D800B67EB0 /* TrackerCollectionViewCell.swift */; };
+		E9E7A5E12C0734A500B67EB0 /* TrackerCollectionSupplementaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7A5E02C0734A500B67EB0 /* TrackerCollectionSupplementaryView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,6 +73,8 @@
 		E9D3121F2BC4834300F8C0E5 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		E9D312212BC4846A00F8C0E5 /* StatisticViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticViewController.swift; sourceTree = "<group>"; };
 		E9E7A5DB2C0244E900B67EB0 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		E9E7A5DD2C0733D800B67EB0 /* TrackerCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCollectionViewCell.swift; sourceTree = "<group>"; };
+		E9E7A5E02C0734A500B67EB0 /* TrackerCollectionSupplementaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCollectionSupplementaryView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -170,6 +174,8 @@
 				E9D311F12BBDE13400F8C0E5 /* TrackerViewController.swift */,
 				E95415752BFCC35100562193 /* EmojiCollectionViewCell.swift */,
 				E95415772BFCE10400562193 /* SupplementaryView.swift */,
+				E9E7A5DD2C0733D800B67EB0 /* TrackerCollectionViewCell.swift */,
+				E9E7A5E02C0734A500B67EB0 /* TrackerCollectionSupplementaryView.swift */,
 			);
 			path = Tracker;
 			sourceTree = "<group>";
@@ -344,6 +350,8 @@
 				E9D3121E2BBDF07C00F8C0E5 /* LaunchScreenViewController.swift in Sources */,
 				E95415782BFCE10400562193 /* SupplementaryView.swift in Sources */,
 				E95415762BFCC35100562193 /* EmojiCollectionViewCell.swift in Sources */,
+				E9E7A5E12C0734A500B67EB0 /* TrackerCollectionSupplementaryView.swift in Sources */,
+				E9E7A5DE2C0733D800B67EB0 /* TrackerCollectionViewCell.swift in Sources */,
 				E954154A2BF6865E00562193 /* TrackerRecord.swift in Sources */,
 				E9D312202BC4834300F8C0E5 /* TabBarController.swift in Sources */,
 				E9D311F02BBDE13400F8C0E5 /* SceneDelegate.swift in Sources */,

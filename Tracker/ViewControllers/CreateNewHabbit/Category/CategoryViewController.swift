@@ -218,43 +218,25 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
         }
          
         // реализация добавления ячеек в таблиц
-        tableView.separatorStyle = .singleLine
-        cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        let isLast = indexPath.row == (categories.count - 1)
+        let isFirst = indexPath.row == 0
         
-        if categories.count == 1 {
-            if indexPath.row == 0 {
-                cell.layer.cornerRadius = 16
-                tableView.separatorStyle = .none
-            }
-        } else if categories.count == 2 {
-            if indexPath.row == 0 {
-                cell.layer.cornerRadius = 16
-                cell.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-                tableView.separatorStyle = .singleLine
-                cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-            } else {
-                if indexPath.row == 1 {
-                    cell.layer.cornerRadius = 16
-                    cell.layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
-                    cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
-                }
-            }
+        if isFirst && isLast {
+            cell.layer.cornerRadius = 16
+            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: tableView.frame.width + 1)
+        } else if isFirst {
+            cell.layer.cornerRadius = 16
+            cell.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+            cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        } else if isLast {
+            cell.layer.cornerRadius = 16
+            cell.layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
+            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: tableView.frame.width + 1)
         } else {
-            if indexPath.row == 0 {
-                cell.layer.cornerRadius = 16
-                cell.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-                tableView.separatorStyle = .singleLine
-                cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-            } else if indexPath.row == 1 {
-                cell.layer.cornerRadius = 0
-                cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-            } else if indexPath.row == 2 {
-                cell.layer.cornerRadius = 16
-                cell.layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
-                cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
-            }
+            cell.layer.cornerRadius = 0
+            cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         }
-        
+
         return cell
     }
     

@@ -20,7 +20,7 @@ final class TrackerViewController: UIViewController {
     let labelTrackerTitle = UILabel()
     let searchBar = UISearchBar()
     
-    let collectionView: UICollectionView = {
+    let trackerCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -104,6 +104,21 @@ final class TrackerViewController: UIViewController {
 //        datePicker.tintColor = UIColor(named: "Blue")
         datePicker.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .valueChanged)
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: datePicker)
+    }
+    
+    func setupTrackerCollectionView() {
+        view.addSubview(trackerCollectionView)
+        trackerCollectionView.translatesAutoresizingMaskIntoConstraints = false
+        
+        trackerCollectionView.register(TrackerCollectionViewCell.self, forCellWithReuseIdentifier: "TrackerCell")
+        trackerCollectionView.register(TrackerCollectionSupplementaryView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
+        
+        NSLayoutConstraint.activate([
+            trackerCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            trackerCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            trackerCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            trackerCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ])
     }
     
     @objc func datePickerValueChanged(_ sender: UIDatePicker) {
