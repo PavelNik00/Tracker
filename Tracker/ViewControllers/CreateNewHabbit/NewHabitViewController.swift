@@ -7,21 +7,29 @@
 
 import UIKit
 
+protocol NewHabitCreateViewControllerDelegate: AnyObject {
+    func didCreateHabit(with trackerCategoryString: TrackerCategory)
+    func didFinishCreatingHabitAndDismiss()
+}
+
 final class NewHabitViewController: UIViewController, CategoryViewControllerDelegate {
     
     weak var addCategoryDelegate: CategoryViewControllerDelegate?
-
+    weak var habitCreateDelegate: NewHabitCreateViewControllerDelegate?
+    
     var selectedHabitName: [Tracker]? = []
     
-    var selectedDays = ""
-    
-    var selectedCategory = ""
+    var selectedDays: String?
+     
+    var selectedCategory: String?
     
     var selectedEmoji: String?
     
     var selectedColor: UIColor?
     
     var selectedCategoryStringForHabit: String?
+    
+    var onDismiss: (() -> Void)?
     
     private var tableViewTopConstraint: NSLayoutConstraint?
     
@@ -316,11 +324,12 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
     
     // метод для активации кнопки "Создать" для привычки
     func updateCreateButtonState() {
-        guard !selectedCategory.isEmpty ,
-              !selectedDays.isEmpty,
-              let selectedEmoji = selectedEmoji,
-              let selectedColor = selectedColor,
+        guard selectedCategory != nil ,
+              selectedDays != nil,
+              selectedEmoji != nil,
+              selectedColor != nil,
               addCategoryNameTextField.text?.isEmpty == false
+                
         else {
             addButton.isEnabled = false
             return
@@ -333,6 +342,7 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
     @objc func addCategoryNameTextFieldEditing(_ textField: UITextField) {
         guard let enteredText = textField.text, !enteredText.isEmpty else { return }
         updateCreateButtonState()
+        print("Введен так \(enteredText)")
     }
     
     // обработка нажатия кнопки "Отменить"
@@ -345,7 +355,35 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
     // обработка нажатия кнопки "Создать" для привычки
     @objc func addButtonDidTap() {
         // прописываем создание привычки
-        print("✅ Новая привычка \(addCategoryNameTextField.text ?? "") создана")
+        guard let selectedHabitName = addCategoryNameTextField.text, !selectedHabitName.isEmpty,
+        let selectedCategoryString = selectedCategory,
+        !selectedCategoryString.isEmpty,
+        let selectedColorSting = selectedColor,
+        let selectedEmojiString = selectedEmoji, !selectedEmojiString.isEmpty,
+        selectedDays != nil
+        else {
+            print("Чего-то не хватает")
+            return
+        }
+        
+        let tracker = Tracker(id: UUID(), name: selectedHabitName, color: selectedColorSting, emoji: selectedEmojiString, schedule: selectedDays ?? "хз")
+        
+        let trackerCategoryString = TrackerCategory(header: selectedCategoryString, trackers: [tracker])
+        
+        if let delegate = habitCreateDelegate {
+            delegate.didCreateHabit(with: trackerCategoryString)
+            print("Вызов делегата на созданиипривычкивью")
+        }
+        
+        finishCreatingHabitAndDismiss()
+        print("✅ Новая привычка c названием категории \(selectedCategoryString), названием привычки \(selectedHabitName), выбранным эмодзи \(selectedEmojiString), выбранным цветом \(selectedColorSting), и выбранными днями \(selectedDays ?? "хз") создана")
+    }
+    
+    func finishCreatingHabitAndDismiss() {
+        dismiss(animated: false) {
+            self.habitCreateDelegate?.didFinishCreatingHabitAndDismiss()
+            print("Вызов делегата на чтобызакрытьпривычкувью")
+        }
     }
     
     // метод для наблюдателя
@@ -398,7 +436,7 @@ extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
             cell.textLabel?.textColor = .black
             cell.detailTextLabel?.font = .systemFont(ofSize: 17, weight: .regular)
             cell.detailTextLabel?.textColor = .black
-            cell.detailTextLabel?.text = selectedCategory.isEmpty ? "" : selectedCategory
+            cell.detailTextLabel?.text = selectedCategory ?? ""
             cell.backgroundColor = UIColor(named: "Light Grey")?.withAlphaComponent(0.3)
             cell.selectionStyle = .none
             
@@ -422,7 +460,7 @@ extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
             cell.textLabel?.textColor = .black
             cell.detailTextLabel?.font = .systemFont(ofSize: 17, weight: .regular)
             cell.detailTextLabel?.textColor = .black
-            cell.detailTextLabel?.text = selectedDays.isEmpty ? "" : selectedDays
+            cell.detailTextLabel?.text = selectedDays ?? ""
             cell.backgroundColor = UIColor(named: "Light Grey")?.withAlphaComponent(0.3)
             cell.selectionStyle = .none
             
@@ -453,11 +491,11 @@ extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
             navigationVC.categoryToPass = { [weak self]  selectedCategory in
                 self?.selectedCategory = selectedCategory
                 tableView.reloadRows(at: [indexPath], with: .automatic)
-                print("Категория добавлена в таблицу")
+                print("✅ Категория \(selectedCategory) добавлена в таблицу")
             }
             navigationVC.modalPresentationStyle = .pageSheet
             present(navigationVC, animated: true)
-            print("Button Категория tapped")
+//            print("Button Категория tapped")
         } else {
             let navigationVC = ScheduleViewController()
             navigationVC.scheduleToPass = { [weak self] selectedDays in
@@ -466,7 +504,7 @@ extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
             }
             navigationVC.modalPresentationStyle = .pageSheet
             present(navigationVC, animated: true)
-            print("Button Расписание tapped")
+            print("✅ Дата добавлена")
         }
     }
 }
@@ -515,6 +553,7 @@ extension NewHabitViewController: UICollectionViewDataSource, UICollectionViewDe
             // выбор ячейки с емодзи
             selectedEmoji = emojiArray[indexPath.row]
             updateCreateButtonState()
+            print("Выбран эмодзи \(selectedEmoji ?? "")")
         } else {
             let cell = colorCollection.cellForItem(at: indexPath)
             cell?.layer.borderWidth = 3
@@ -523,6 +562,7 @@ extension NewHabitViewController: UICollectionViewDataSource, UICollectionViewDe
             // выбор ячейки с цветом
             selectedColor = colorArray[indexPath.row]
             updateCreateButtonState()
+            print("Выбран цвет \(selectedColor ?? UIColor.black)")
         }
     }
     

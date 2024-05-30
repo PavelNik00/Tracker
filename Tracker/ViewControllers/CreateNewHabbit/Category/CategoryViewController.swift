@@ -181,6 +181,8 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
             navigationViewController.modalPresentationStyle = .pageSheet
             present(navigationViewController, animated: true)
             print("Button Добавить категорию tapped")
+            print(#fileID, #function, #line)
+              
         }
     }
     
@@ -208,6 +210,7 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
     // настройка ячейки категории
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath) as! CategoryCell
+        
         cell.categoryLabel.text = categories[indexPath.row].header
         cell.backgroundColor = UIColor(named: "Light Grey")?.withAlphaComponent(0.3)
         

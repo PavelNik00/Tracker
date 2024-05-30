@@ -25,7 +25,7 @@ final class TabBarController: UITabBarController {
     func setupViewControllers() {
 
         let trackerViewController = UINavigationController(
-            rootViewController: TrackerViewController())
+            rootViewController: TrackerViewController(categories: [], completedTrackers: [], newCategories: []))
         trackerViewController.tabBarItem = UITabBarItem(
             title: "Трекер",
             image: UIImage(named: "icon_tracker_no_active"),

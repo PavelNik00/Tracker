@@ -35,16 +35,16 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     func setupTrackeCellView() {
         contentView.addSubview(trackerCellView)
         trackerCellView.translatesAutoresizingMaskIntoConstraints = false
-        trackerCellView.layer.cornerRadius = 16
+        trackerCellView.layer.cornerRadius = 0
         trackerCellView.layer.masksToBounds = true
         trackerCellView.backgroundColor = .black
         
         NSLayoutConstraint.activate([
-            trackerCellView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            trackerCellView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 100),
             trackerCellView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            trackerCellView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            trackerCellView.heightAnchor.constraint(equalToConstant: 90)
-            
+//            trackerCellView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            trackerCellView.heightAnchor.constraint(equalToConstant: 150),
+            trackerCellView.widthAnchor.constraint(equalToConstant: 150)
         ])
     }
     
@@ -67,7 +67,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     func setupEmojiLabel() {
         contentView.addSubview(emojiLabel)
         emojiLabel.translatesAutoresizingMaskIntoConstraints = false
-        emojiLabel.layer.cornerRadius = emojiLabel.frame.width / 2
+        emojiLabel.layer.cornerRadius = 16
         emojiLabel.layer.masksToBounds = true
         emojiLabel.backgroundColor = .white.withAlphaComponent(0.3)
         emojiLabel.font = .systemFont(ofSize: 16)
@@ -101,7 +101,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         plusButton.layer.cornerRadius = plusButton.frame.width / 2
         plusButton.layer.masksToBounds = true
         plusButton.backgroundColor = .black
-        plusButton.setImage(UIImage(systemName: "icon_plus"), for: .normal)
+        plusButton.setImage(UIImage(systemName: "icon_plus_white"), for: .normal)
         
         NSLayoutConstraint.activate([
             plusButton.topAnchor.constraint(equalTo: trackerCellView.bottomAnchor, constant: 8),
@@ -110,4 +110,5 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
             plusButton.widthAnchor.constraint(equalToConstant: 34)
         ])
     }
+    
 }

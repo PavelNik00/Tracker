@@ -7,7 +7,10 @@
 
 import UIKit
 
-final class ChooseTypeOfTrackerVC: UIViewController {
+final class ChooseTypeOfTrackerVC: UIViewController, NewHabitCreateViewControllerDelegate {
+    
+    weak var habitCreateDelegate: NewHabitCreateViewControllerDelegate?
+    var didFinishCreatingHabitAndDismissCalled = false
     
     private let label: UILabel = {
         let label = UILabel()
@@ -78,6 +81,7 @@ final class ChooseTypeOfTrackerVC: UIViewController {
     
     @objc func setupNewHabitButton() {
         let addNewVC = NewHabitViewController()
+        addNewVC.habitCreateDelegate = self 
         let addNavigationController = UINavigationController(rootViewController: addNewVC)
         addNavigationController.modalPresentationStyle = .pageSheet
         present(addNavigationController, animated: true)
@@ -86,5 +90,21 @@ final class ChooseTypeOfTrackerVC: UIViewController {
     
     @objc func setupIrregEventButton() {
         print("Irregular Event button tapped")
+    }
+    
+    func didCreateHabit(with trackerCategoryString: TrackerCategory) {
+        self.habitCreateDelegate?.didCreateHabit(with: trackerCategoryString)
+    }
+    
+    func didFinishCreatingHabitAndDismiss() {
+        guard !didFinishCreatingHabitAndDismissCalled else {
+            return
+        }
+        didFinishCreatingHabitAndDismissCalled = true
+        
+        dismiss(animated: true) {
+            self.habitCreateDelegate?.didFinishCreatingHabitAndDismiss()
+        }
+        print("Вызов делегата на выборпривычкалилисобытие")
     }
 }
