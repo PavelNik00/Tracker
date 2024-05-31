@@ -14,8 +14,11 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
     var newHabit: [Tracker]
     
     // трекеры, которые были выполнены в выбранную дату хранятся здесь
-    var completedTrackers: Set<UUID> = []
+    var completedTrackers: [TrackerRecord] = []
     var completedDaysCount: Int = 0
+    
+    var isCompleted: Bool?
+    var trackerID: UUID?
     
     var selectedHabitNameString: String?
     var selectedCategoryName: String?
@@ -35,6 +38,7 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
     
     let trackerCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
+//        layout.headerReferenceSize = CGSize(width: 100, height: 50)
         layout.scrollDirection = .vertical
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         return collectionView
@@ -163,14 +167,16 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         view.addSubview(trackerCollectionView)
         trackerCollectionView.translatesAutoresizingMaskIntoConstraints = false
         
-//        let layout = trackerCollectionView.collectionViewLayout as? UICollectionViewFlowLayout
-//        layout?.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-//        layout?.headerReferenceSize = CGSize(width: trackerCollectionView.frame.width, height: 50)
+        let layout = trackerCollectionView.collectionViewLayout as? UICollectionViewFlowLayout
+        layout?.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        layout?.headerReferenceSize = CGSize(width: trackerCollectionView.frame.width, height: 50)
+        
+        trackerCollectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 
         trackerCollectionView.register(TrackerCollectionViewCell.self, forCellWithReuseIdentifier: "TrackerCell")
-        trackerCollectionView.register(TrackerCollectionSupplementaryView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
+        trackerCollectionView.register(TrackerCollectionSupplementaryView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "Header")
         
-        trackerCollectionView.backgroundColor = .black
+        trackerCollectionView.backgroundColor = .lightGrey
         trackerCollectionView.delegate = self
         trackerCollectionView.dataSource = self
         
@@ -199,10 +205,7 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         print("Нажата клавиша создания привычки или события")
     }
     
-    @objc func plusButtonTapped() {
-        
-    }
-    
+
     func didFinishCreatingHabitAndDismiss() {
         updateView()
         print("Вызов делегата на трекерконтролере")
@@ -256,7 +259,7 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
 }
 
 // настройка коллекции
-extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return categories.count
@@ -276,24 +279,30 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
         let category = categories[indexPath.section]
         
         if let tracker = category.trackers?[indexPath.item] {
-            var isChecked = completedTrackers.contains { $0 == tracker.id }
+            var isChecked = completedTrackers.contains { $0.id == tracker.id }
             
             cell.titleLabel.text = tracker.name
             cell.emojiLabel.text = tracker.emoji
             cell.trackerCellView.backgroundColor = tracker.color
-            cell.plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
+            cell.dayLabel.text = isChecked ? "1" : "0"
+            cell.alpha = isChecked ? 0.3 : 1.0
+//            cell.plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
+            
+            let image = isChecked ? UIImage(named: "icon_done_white") : UIImage(named: "icon_button_plus")
+            cell.plusButton.setImage(image, for: .normal)
+            cell.plusButton.tintColor = tracker.color.withAlphaComponent(isChecked ? 0.3 : 1.0)
             
             let today = Date()
             cell.plusButton.isEnabled = currentDate > today ? false : true
             
-            if isChecked {
-                cell.plusButton.setImage(UIImage(systemName: "icon_done_white"), for: .normal)
-                cell.alpha = 0.3
-                cell.dayLabel.text = "1"
-            } else {
-                cell.plusButton.setImage(UIImage(systemName: "icon_plus_white"), for: .normal)
-                cell.alpha = 1.0
-                cell.dayLabel.text = "0"
+            cell.buttonTapped = { [weak self] in
+                guard let self = self else { return }
+                if let index = self.completedTrackers.firstIndex(where: { $0.id == tracker.id }) {
+                    self.completedTrackers.remove(at: index)
+                } else {
+                    self.completedTrackers.append(TrackerRecord(id: tracker.id, date: Date()))
+                }
+                collectionView.reloadData()
             }
             
         }
@@ -305,26 +314,40 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
     // настраиваем саплиментаривью(название категории)
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         
-        let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header", for: indexPath) as! SupplementaryView
+        let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "Header", for: indexPath) as! TrackerCollectionSupplementaryView
         
-        header.label.text = categories[indexPath.section].header
+        header.titleLabel.text = categories[indexPath.section].header
         return header
     }
     
     // настройка размера ячейки
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        return CGSize(width: collectionView.bounds.width / 2, height: 150)
+        return CGSize(width: (collectionView.bounds.width / 2) - 15, height: 150)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 10
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 10
     }
     
     // настраиваем размер хедера
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         
-        let indexPath = IndexPath(row: 0, section: section)
-        let headerView = self.collectionView(collectionView, viewForSupplementaryElementOfKind: UICollectionView.elementKindSectionHeader, at: indexPath)
-        
-        return headerView.systemLayoutSizeFitting(CGSize(width: collectionView.frame.width,
-                                                         height: UIView.layoutFittingExpandedSize.height), withHorizontalFittingPriority: .required, verticalFittingPriority: .fittingSizeLevel)
+//        let indexPath = IndexPath(row: 0, section: section)
+//        let headerView = self.collectionView(collectionView, viewForSupplementaryElementOfKind: UICollectionView.elementKindSectionHeader, at: indexPath)
+//        
+//        return headerView.systemLayoutSizeFitting(
+//            CGSize(width: collectionView.frame.width,
+//                height: UIView.layoutFittingExpandedSize.height), withHorizontalFittingPriority: .required, verticalFittingPriority: .fittingSizeLevel)
+        return CGSize(width: collectionView.bounds.width, height: 50)
     }
     
 }
