@@ -7,7 +7,15 @@
 
 import UIKit
 
+protocol TrackerCollectionViewCellDelegate: AnyObject {
+    func completedTracker(id: UUID, at indexPath: IndexPath) // кнопка завершения
+    func uncompletedTracker(id: UUID, at indexPath: IndexPath) // кнопка галочки
+}
+
 final class TrackerCollectionViewCell: UICollectionViewCell {
+    
+    // делегат для обработки нажатия кнопки в ячейке
+    weak var delegate: TrackerCollectionViewCellDelegate?
     
     var trackerCellView = UIView()
     
@@ -17,9 +25,12 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     var dayLabel = UILabel()
     var plusButton = UIButton()
     
-    var buttonTapped: (() -> Void)?
+    var remainder10: Int = 0
+    var tracker: [Tracker] = []
     
-    var days = 0
+    private var isCompletedToday: Bool = false
+    private var trackerId: UUID?
+    private var indexPath: IndexPath?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -70,10 +81,6 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     func setupEmojiLabelBG() {
         contentView.addSubview(emojiLabelBG)
         emojiLabelBG.translatesAutoresizingMaskIntoConstraints = false
-//        emojiLabelBG.frame.size = CGSize(width: 24, height: 24)
-//        emojiLabelBG.layer.cornerRadius = frame.size.width / 2
-//        emojiLabelBG.layer.masksToBounds = true
-//        emojiLabelBG.backgroundColor = .white.withAlphaComponent(0.3)
         emojiLabelBG.setImage(UIImage(named: "icon_emojiBG"), for: .normal)
         emojiLabelBG.isEnabled = false
         
@@ -88,25 +95,17 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     func setupEmojiLabel() {
         contentView.addSubview(emojiLabel)
         emojiLabel.translatesAutoresizingMaskIntoConstraints = false
-//        emojiLabel.layer.cornerRadius = 0
-//        emojiLabel.layer.masksToBounds = true
-//        emojiLabel.backgroundColor = .white.withAlphaComponent(0.3)
         emojiLabel.font = .systemFont(ofSize: 12)
         
         NSLayoutConstraint.activate([
-//            emojiLabel.leadingAnchor.constraint(equalTo: trackerCellView.leadingAnchor, constant: 12),
-//            emojiLabel.topAnchor.constraint(equalTo: trackerCellView.topAnchor, constant: 12),
             emojiLabel.centerXAnchor.constraint(equalTo: emojiLabelBG.centerXAnchor),
             emojiLabel.centerYAnchor.constraint(equalTo: emojiLabelBG.centerYAnchor)
-//            emojiLabel.heightAnchor.constraint(equalToConstant: 12),
-//            emojiLabel.widthAnchor.constraint(equalToConstant: 12)
         ])
     }
     
     func setupDayLabel() {
         contentView.addSubview(dayLabel)
         dayLabel.translatesAutoresizingMaskIntoConstraints = false
-        dayLabel.text = "\(days) дней"
         dayLabel.font = .systemFont(ofSize: 12, weight: .medium)
         dayLabel.textColor = .black
         dayLabel.textAlignment = .left
@@ -121,12 +120,9 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     func setupDoneButton() {
         contentView.addSubview(plusButton)
         plusButton.translatesAutoresizingMaskIntoConstraints = false
-//        plusButton.layer.cornerRadius = 68
-//        plusButton.layer.masksToBounds = true
-//        plusButton.backgroundColor = .black
+        plusButton.layer.cornerRadius = 17
+        plusButton.layer.masksToBounds = true
         plusButton.setImage(UIImage(systemName: "icon_button_black"), for: .normal)
-//        plusButton.setTitle("+", for: .normal)
-//        plusButton.setTitleColor(.white, for: .normal)
         plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
         
         NSLayoutConstraint.activate([
@@ -137,8 +133,57 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         ])
     }
     
+    // метод для создания ячейки
+    func configure(with tracker: Tracker,
+                   isCompletedToday: Bool,
+                   completedDays: Int,
+                   indexPath: IndexPath
+    ) {
+        
+        self.isCompletedToday = isCompletedToday
+        self.trackerId = tracker.id // присваиваем id для ячейки
+        self.indexPath = indexPath // присваиваем индекспас
+        
+        titleLabel.text = tracker.name
+        emojiLabel.text = tracker.emoji
+        trackerCellView.backgroundColor = tracker.color
+        plusButton.backgroundColor = tracker.color
+        
+        let wordDay = pluralizeDays(completedDays)
+        dayLabel.text = "\(wordDay)"
+        
+        plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
+        
+        let image = isCompletedToday ? UIImage(named: "icon_done_white") : UIImage(named: "icon_plus_white")
+        plusButton.setImage(image, for: .normal)
+        plusButton.alpha = isCompletedToday ? 0.3 : 1.0
+    }
+    
+    private func pluralizeDays(_ count: Int) -> String {
+        let remainder100 = count % 100
+        
+        if remainder100 == 1 && remainder100 != 11 {
+            return "\(count) день"
+        } else if remainder100 >= 2 && remainder100 <= 4 && (remainder100 < 10 || remainder100 >= 20) {
+            return "\(count) дня"
+        } else {
+            return "\(count) дней"
+        }
+    }
+    
+    // обработка нажатия на кнопку "+"
     @objc func plusButtonTapped() {
-        buttonTapped?()
+        guard let trackerId = trackerId,
+                let indexPath = indexPath
+        else {
+            assertionFailure("no trackerID")
+            return }
+    
+        if isCompletedToday {
+            delegate?.uncompletedTracker(id: trackerId, at: indexPath)
+        } else {
+            delegate?.completedTracker(id: trackerId, at: indexPath)
+        }
         print("Нажата клавиша +")
     }
     
