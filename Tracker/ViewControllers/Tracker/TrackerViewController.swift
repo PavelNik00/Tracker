@@ -16,10 +16,7 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
     // трекеры, которые были выполнены в выбранную дату хранятся здесь
     var completedTrackers: [TrackerRecord] = []
     
-//    var completedDaysCount: Int = 0
-//    var isCompleted: Bool?
     var trackerID: UUID?
-//    var indexPathTracker: IndexPath?
     
     var selectedHabitNameString: String?
     var selectedCategoryName: String?
@@ -94,11 +91,12 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
             setupErrorImage()
             setuplabelQuestion()
             print("Загрузка картинки и рыбы-текста")
-        } else if selectedHabitNameString != nil {
+        } else {
             setupTrackerCollectionView()
-            trackerCollectionView.reloadData()
+//            trackerCollectionView.reloadData()
             print("Загрузка коллекции")
         }
+        trackerCollectionView.reloadData()
     }
     
     private func setupErrorImage() {
@@ -234,42 +232,48 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         
         selectedHabitNameString = trackerCategoryString.trackers?.first?.name
         selectedCategoryName = trackerCategoryString.header
-        selectedDaysString = trackerCategoryString.trackers?.first?.schedule
+        selectedDaysString = trackerCategoryString.trackers?.first?.schedule.joined(separator: ", ")
         selectedColorName = trackerCategoryString.trackers?.first?.color
         selectedEmojiString = trackerCategoryString.trackers?.first?.emoji
         
-        if let categoryIndex = categories.firstIndex(where: { $0.header == selectedCategoryName }) {
+        if let selectedDaysString = selectedDaysString {
+            let scheduleComponents = selectedDaysString.components(separatedBy: ", ")
             
-            let category = categories[categoryIndex]
-            let newHabit = Tracker(id: UUID(),
-                                   name: selectedHabitNameString ?? "Какое-то название :(",
-                                   color: selectedColorName ?? UIColor.black,
-                                   emoji: selectedEmojiString ?? "⭕️",
-                                   schedule: selectedDaysString ?? "???")
-            
-            var updateTrackerArray = category.trackers ?? []
-            updateTrackerArray.append(newHabit)
-            
-            let updatedCategory = TrackerCategory(
-                header: category.header,
-                trackers: updateTrackerArray)
-            
-            categories[categoryIndex] = updatedCategory
-            
-        } else {
-            
-            let newHabit = Tracker(
-                id: UUID(),
-                name: selectedHabitNameString ?? "Какое-то название :(",
-                color: selectedColorName ?? UIColor.black,
-                emoji: selectedEmojiString ?? "⭕️",
-                schedule: selectedDaysString ?? "???")
-            
-            let newCategory = TrackerCategory(
-                header: selectedCategoryName ?? "Неопознанная категория :(",
-                trackers: [newHabit])
-            
-            categories.append(newCategory)
+            for day in scheduleComponents {
+                if let categoryIndex = categories.firstIndex(where: { $0.header == selectedCategoryName }) {
+                    
+                    let category = categories[categoryIndex]
+                    let newHabit = Tracker(id: UUID(),
+                                           name: selectedHabitNameString ?? "Какое-то название :(",
+                                           color: selectedColorName ?? UIColor.black,
+                                           emoji: selectedEmojiString ?? "⭕️",
+                                           schedule: [day])
+                    
+                    var updateTrackerArray = category.trackers ?? []
+                    updateTrackerArray.append(newHabit)
+                    
+                    let updatedCategory = TrackerCategory(
+                        header: category.header,
+                        trackers: updateTrackerArray)
+                    
+                    categories[categoryIndex] = updatedCategory
+                    
+                } else {
+                    
+                    let newHabit = Tracker(
+                        id: UUID(),
+                        name: selectedHabitNameString ?? "Какое-то название :(",
+                        color: selectedColorName ?? UIColor.black,
+                        emoji: selectedEmojiString ?? "⭕️",
+                        schedule: [day])
+                    
+                    let newCategory = TrackerCategory(
+                        header: selectedCategoryName ?? "Неопознанная категория :(",
+                        trackers: [newHabit])
+                    
+                    categories.append(newCategory)
+                }
+            }
         }
         trackerCollectionView.reloadData()
         updateView()
@@ -291,7 +295,7 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
         
         // метод для фильтрации трекеров по дням недели
         let filterTrackers = category.trackers?.filter { tracker in
-            let scheduleComponents = tracker.schedule.components(separatedBy: ", ")
+            let scheduleComponents = tracker.schedule
             let dayOfWeek = Calendar.current.component(.weekday, from: currentDate)
             let weekDaySymbols = Calendar.current.weekdaySymbols
             let selectedDayName = weekDaySymbols[dayOfWeek - 1]
@@ -303,6 +307,7 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
         }
         
         let count = filterTrackers?.count ?? 0
+        trackerCollectionView.reloadData()
         print("Количество трекеров в секции \(section): \(count)")
         return count
 //        return category.trackers?.count ?? 0
@@ -317,18 +322,11 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
         cell.delegate = self
         let cellData = categories[indexPath.section]
         guard let tracker = cellData.trackers?[indexPath.row] else { return UICollectionViewCell() }
-        
-//        let isCompletedToday = isTrackerCompletedToday(id: tracker.id, at: indexPath)
-        
-        // находим количество завершенных дней путем фильтрации нахождения количества одинаковых id
-//       let completedDays = completedTrackers.filter {
-//           $0.id == tracker.id
-//        }.count
 
         // метод для фильтрации трекеров по дням недели
 
         let filterTrackers = cellData.trackers?.filter { tracker in
-            let scheduleComponents = tracker.schedule.components(separatedBy: ", ")
+            let scheduleComponents = tracker.schedule
             let dayOfWeek = Calendar.current.component(.weekday, from: currentDate)
             let weekDaySymbols = Calendar.current.weekdaySymbols
             let selectedDayName = weekDaySymbols[dayOfWeek - 1]
@@ -353,11 +351,6 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
         } else {
             print("Проблема с отображением ячейки")
         }
-//        cell.configure(with: tracker,
-//                       isCompletedToday: isCompletedToday, 
-//                       completedDays: completedDays,
-//                       indexPath: indexPath
-//        )
 
         return cell
     }
@@ -380,19 +373,37 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "Header", for: indexPath) as! TrackerCollectionSupplementaryView
+         
+        let category = categories[indexPath.section]
+        let filterTrackers = category.trackers?.filter { tracker in
+            let scheduleComponents = tracker.schedule
+            let dayOfWeek = Calendar.current.component(.weekday, from: currentDate)
+            let weekDaySymbols = Calendar.current.weekdaySymbols
+            let selectedDayName = weekDaySymbols[dayOfWeek - 1]
+            
+            // Преобразуем расписание на русском в английские дни недели
+            let englishScheduleComponents = scheduleComponents.compactMap { dayOfWeekMapping[$0] }
+            print("Фильтруем трекер с расписанием: \(scheduleComponents) для дня: \(selectedDayName)")
+            return englishScheduleComponents.contains(selectedDayName)
+        }
         
-        header.titleLabel.text = categories[indexPath.section].header
+        if filterTrackers?.isEmpty == false  {
+            header.titleLabel.text = categories[indexPath.section].header
+        } else {
+                header.titleLabel.text = nil
+        }
+        
         return header
     }
     
     // настройка размера ячейки
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        return CGSize(width: (collectionView.bounds.width / 2) - 15, height: 150)
+        return CGSize(width: (collectionView.bounds.width / 2) - 5, height: 150)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
+        return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
@@ -406,7 +417,23 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
     // настраиваем размер хедера
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
 
-        return CGSize(width: collectionView.bounds.width, height: 50)
+        let category = categories[section]
+        let filterTrackers = category.trackers?.filter { tracker in
+            let scheduleComponents = tracker.schedule
+            let dayOfWeek = Calendar.current.component(.weekday, from: currentDate)
+            let weekDaySymbols = Calendar.current.weekdaySymbols
+            let selectedDayName = weekDaySymbols[dayOfWeek - 1]
+            
+            // Преобразуем расписание на русском в английские дни недели
+            let englishScheduleComponents = scheduleComponents.compactMap { dayOfWeekMapping[$0] }
+            return englishScheduleComponents.contains(selectedDayName)
+        }
+        
+        if filterTrackers?.isEmpty == false {
+            return CGSize(width: collectionView.bounds.width, height: 50)
+        } else {
+            return CGSize(width: collectionView.bounds.width, height: 0)
+        }
     }
     
 }

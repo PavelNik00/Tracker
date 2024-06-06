@@ -360,13 +360,15 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         !selectedCategoryString.isEmpty,
         let selectedColorSting = selectedColor,
         let selectedEmojiString = selectedEmoji, !selectedEmojiString.isEmpty,
-        selectedDays != nil
+        let selectedDays = selectedDays
         else {
             print("Чего-то не хватает")
             return
         }
         
-        let tracker = Tracker(id: UUID(), name: selectedHabitName, color: selectedColorSting, emoji: selectedEmojiString, schedule: selectedDays ?? "хз")
+        let scheduleComponents = selectedDays.components(separatedBy: ", ").map { $0.trimmingCharacters(in: .whitespaces) }
+        
+        let tracker = Tracker(id: UUID(), name: selectedHabitName, color: selectedColorSting, emoji: selectedEmojiString, schedule: scheduleComponents)
         
         let trackerCategoryString = TrackerCategory(header: selectedCategoryString, trackers: [tracker])
         
@@ -376,7 +378,7 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         }
         
         finishCreatingHabitAndDismiss()
-        print("✅ Новая привычка c названием категории \(selectedCategoryString), названием привычки \(selectedHabitName), выбранным эмодзи \(selectedEmojiString), выбранным цветом \(selectedColorSting), и выбранными днями \(selectedDays ?? "хз") создана")
+        print("✅ Новая привычка c названием категории \(selectedCategoryString), названием привычки \(selectedHabitName), выбранным эмодзи \(selectedEmojiString), выбранным цветом \(selectedColorSting), и выбранными днями \(scheduleComponents) создана")
     }
     
     func finishCreatingHabitAndDismiss() {
