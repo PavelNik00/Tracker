@@ -18,7 +18,7 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
     
 //    var completedDaysCount: Int = 0
 //    var isCompleted: Bool?
-//    var trackerID: UUID?
+    var trackerID: UUID?
 //    var indexPathTracker: IndexPath?
     
     var selectedHabitNameString: String?
@@ -28,7 +28,9 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
     var selectedEmojiString: String?
     
     let datePicker = UIDatePicker()
-    lazy var selectedDate = datePicker.date
+    var currentDate: Date = Date()
+    
+//    lazy var selectedDate = datePicker.date
     
     let errorImage = UIImageView()
     let labelQuestion = UILabel()
@@ -36,6 +38,17 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
     let searchBar = UISearchBar()
     
     let newHabitViewController = NewHabitViewController()
+    
+    // массив для преобразования полученной даты из rus в eng
+    let dayOfWeekMapping: [String: String] = [
+        "Пн" : "Monday",
+        "Вт": "Tuesday",
+        "Ср": "Wednesday",
+        "Чт": "Thursday",
+        "Пт": "Friday",
+        "Сб": "Saturday",
+        "Вс": "Sunday"
+    ]
     
     let trackerCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -83,6 +96,7 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
             print("Загрузка картинки и рыбы-текста")
         } else if selectedHabitNameString != nil {
             setupTrackerCollectionView()
+            trackerCollectionView.reloadData()
             print("Загрузка коллекции")
         }
     }
@@ -190,12 +204,13 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
     
     @objc func datePickerValueChanged(_ sender: UIDatePicker) {
         let selectedDateNew = sender.date
-        selectedDate = selectedDateNew
+        currentDate = selectedDateNew
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd.MM.yy"
-        let formattedDate = dateFormatter.string(from: selectedDate)
-        sender.removeFromSuperview()
-        trackerCollectionView.reloadData()
+        let formattedDate = dateFormatter.string(from: currentDate)
+//        sender.removeFromSuperview()
+        
+        updateView()
         print("Выбранная дата: \(formattedDate)")
     }
     
@@ -214,6 +229,7 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         print("Вызов делегата на трекерконтролере")
     }
     
+    // метод для получения данных из NewHabitVC
     func didCreateHabit(with trackerCategoryString: TrackerCategory) {
         
         selectedHabitNameString = trackerCategoryString.trackers?.first?.name
@@ -257,6 +273,7 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         }
         trackerCollectionView.reloadData()
         updateView()
+        print("Добавлена новая категория в TrackerCategory")
         print("Сработал делегат на TrackerVC")
     }
 }
@@ -271,7 +288,24 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
     // количество ячеек
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let category = categories[section]
-        return category.trackers?.count ?? 0
+        
+        // метод для фильтрации трекеров по дням недели
+        let filterTrackers = category.trackers?.filter { tracker in
+            let scheduleComponents = tracker.schedule.components(separatedBy: ", ")
+            let dayOfWeek = Calendar.current.component(.weekday, from: currentDate)
+            let weekDaySymbols = Calendar.current.weekdaySymbols
+            let selectedDayName = weekDaySymbols[dayOfWeek - 1]
+            
+            // Преобразуем расписание на русском в английские дни недели
+            let englishScheduleComponents = scheduleComponents.compactMap { dayOfWeekMapping[$0] }
+            print("Фильтруем трекер с расписанием: \(scheduleComponents) для дня: \(selectedDayName)")
+            return englishScheduleComponents.contains(selectedDayName)
+        }
+        
+        let count = filterTrackers?.count ?? 0
+        print("Количество трекеров в секции \(section): \(count)")
+        return count
+//        return category.trackers?.count ?? 0
     }
     
     // настройка ячейки
@@ -284,18 +318,46 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
         let cellData = categories[indexPath.section]
         guard let tracker = cellData.trackers?[indexPath.row] else { return UICollectionViewCell() }
         
-        let isCompletedToday = isTrackerCompletedToday(id: tracker.id, at: indexPath)
+//        let isCompletedToday = isTrackerCompletedToday(id: tracker.id, at: indexPath)
         
         // находим количество завершенных дней путем фильтрации нахождения количества одинаковых id
-        let completedDays = completedTrackers.filter {
-            $0.id == tracker.id
-        }.count
+//       let completedDays = completedTrackers.filter {
+//           $0.id == tracker.id
+//        }.count
+
+        // метод для фильтрации трекеров по дням недели
+
+        let filterTrackers = cellData.trackers?.filter { tracker in
+            let scheduleComponents = tracker.schedule.components(separatedBy: ", ")
+            let dayOfWeek = Calendar.current.component(.weekday, from: currentDate)
+            let weekDaySymbols = Calendar.current.weekdaySymbols
+            let selectedDayName = weekDaySymbols[dayOfWeek - 1]
+            
+            // Преобразуем расписание на русском в английские дни недели
+            let englishScheduleComponents = scheduleComponents.compactMap { dayOfWeekMapping[$0] }
+            print("Фильтруем трекер с расписанием: \(scheduleComponents) для дня: \(selectedDayName)")
+            return englishScheduleComponents.contains(selectedDayName)
+        }
         
-        cell.configure(with: tracker,
-                       isCompletedToday: isCompletedToday, 
-                       completedDays: completedDays,
-                       indexPath: indexPath
-        )
+        if let tracker = filterTrackers?[indexPath.row] {
+            let isCompletedToday = isTrackerCompletedToday(id: tracker.id, at: indexPath)
+            let completedDays = completedTrackers.filter {
+                $0.id == tracker.id
+            }.count
+            cell.configure(with: tracker,
+                           isCompletedToday: isCompletedToday,
+                           completedDays: completedDays,
+                           indexPath: indexPath
+            )
+            print("Конфигурация ячейки для трекера: \(tracker.name)")
+        } else {
+            print("Проблема с отображением ячейки")
+        }
+//        cell.configure(with: tracker,
+//                       isCompletedToday: isCompletedToday, 
+//                       completedDays: completedDays,
+//                       indexPath: indexPath
+//        )
 
         return cell
     }
@@ -310,6 +372,7 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
     private func isSameTrackerRecord(trackerRecord: TrackerRecord, id: UUID) -> Bool {
         // проверка по дню, не учитывая время
         let isSameDay = Calendar.current.isDate(trackerRecord.date, inSameDayAs: datePicker.date)
+        print("выполнена проверка на соответсвте id и даты")
         return trackerRecord.id == id && isSameDay
     }
     
@@ -353,10 +416,11 @@ extension TrackerViewController: TrackerCollectionViewCellDelegate {
     
     func completedTracker(id: UUID, at indexPath: IndexPath) {
         let trackerRecord = TrackerRecord(id: id, date: datePicker.date)
-        completedTrackers.append(trackerRecord) // добавиление в хранилизе записей
+        completedTrackers.append(trackerRecord) // добавиление в хранилище записей
         
         // обновление для одной ячейки
         trackerCollectionView.reloadItems(at: [indexPath])
+        print("Добавление \(id) в хранилище записей")
     }
     
     func uncompletedTracker(id: UUID, at indexPath: IndexPath) {
@@ -364,5 +428,7 @@ extension TrackerViewController: TrackerCollectionViewCellDelegate {
             isSameTrackerRecord(trackerRecord: trackerRecord, id: id)
         }
         trackerCollectionView.reloadItems(at: [indexPath])
+        print("Удаление \(id) из хранилища записей")
+
     }
 }

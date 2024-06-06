@@ -139,7 +139,6 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
                    completedDays: Int,
                    indexPath: IndexPath
     ) {
-        
         self.isCompletedToday = isCompletedToday
         self.trackerId = tracker.id // присваиваем id для ячейки
         self.indexPath = indexPath // присваиваем индекспас
