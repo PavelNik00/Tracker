@@ -87,16 +87,22 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
     
     
     private func updateView() {
-        if categories.isEmpty {
+        if !isHabitExistsForSelectedDate() {
             setupErrorImage()
             setuplabelQuestion()
             print("Загрузка картинки и рыбы-текста")
         } else {
+            removeErrorImageAndLabelQuestion()
             setupTrackerCollectionView()
 //            trackerCollectionView.reloadData()
             print("Загрузка коллекции")
         }
         trackerCollectionView.reloadData()
+    }
+    
+    private func removeErrorImageAndLabelQuestion() {
+        errorImage.removeFromSuperview()
+        labelQuestion.removeFromSuperview()
     }
     
     private func setupErrorImage() {
@@ -206,10 +212,33 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd.MM.yy"
         let formattedDate = dateFormatter.string(from: currentDate)
-//        sender.removeFromSuperview()
+        
+        if isHabitExistsForSelectedDate() {
+            removeErrorImageAndLabelQuestion()
+        }
         
         updateView()
         print("Выбранная дата: \(formattedDate)")
+    }
+    
+    // метод для обновления ячейки, есть ли привычка для выбранного дня или нет. Используется для обновления UI - отображения заглушки/коллекции
+    private func isHabitExistsForSelectedDate() -> Bool {
+        for category in categories {
+            if let trackers = category.trackers {
+                for tracker in trackers {
+                    let scheduleComponents = tracker.schedule
+                    let dayOfWeek = Calendar.current.component(.weekday, from: currentDate)
+                    let weekDaySymbols = Calendar.current.weekdaySymbols
+                    let selectedDayName = weekDaySymbols[dayOfWeek - 1]
+                    
+                    let englishScheduleComponents = scheduleComponents.compactMap { dayOfWeekMapping[$0]}
+                    if englishScheduleComponents.contains(selectedDayName) {
+                        return true
+                    }
+                }
+            }
+        }
+        return false
     }
     
     @objc func addButtonTapped() {
@@ -273,9 +302,11 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
                     
                     categories.append(newCategory)
                 }
+                trackerCollectionView.reloadData()
+//                updateView()
             }
         }
-        trackerCollectionView.reloadData()
+        
         updateView()
         print("Добавлена новая категория в TrackerCategory")
         print("Сработал делегат на TrackerVC")
@@ -307,7 +338,15 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
         }
         
         let count = filterTrackers?.count ?? 0
-        trackerCollectionView.reloadData()
+        
+//        if count == 0 {
+//            setupErrorImage()
+//            setuplabelQuestion()
+//        } else {
+//            removeErrorImageAndLabelQuestion()
+//        }
+    
+//        trackerCollectionView.reloadData()
         print("Количество трекеров в секции \(section): \(count)")
         return count
 //        return category.trackers?.count ?? 0
@@ -351,7 +390,7 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
         } else {
             print("Проблема с отображением ячейки")
         }
-
+        
         return cell
     }
     
