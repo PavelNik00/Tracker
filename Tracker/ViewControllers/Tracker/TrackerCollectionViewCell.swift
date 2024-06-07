@@ -141,12 +141,23 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     ) {
         self.isCompletedToday = isCompletedToday
         self.trackerId = tracker.id // присваиваем id для ячейки
-        self.indexPath = indexPath // присваиваем индекспас
+        self.indexPath = indexPath // присваиваем индекс пути
         
         titleLabel.text = tracker.name
         emojiLabel.text = tracker.emoji
         trackerCellView.backgroundColor = tracker.color
         plusButton.backgroundColor = tracker.color
+        
+        // проверка для активности/неактивности кнопки добавления в TrackerRecord
+        // получаем ссылку на родительский VC
+        if let currentDate = (superview as? UICollectionView)?.delegate as? TrackerViewController {
+            // если текущая дата в VC является сегодняшней или прошедшей, то
+            if isPastOrCurrentDate(currentDate.currentDate) {
+                plusButton.isEnabled = true
+            } else {
+                plusButton.isEnabled = false
+            }
+        }
         
         let wordDay = pluralizeDays(completedDays)
         dayLabel.text = "\(wordDay)"
@@ -156,6 +167,16 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         let image = isCompletedToday ? UIImage(named: "icon_done_white") : UIImage(named: "icon_plus_white")
         plusButton.setImage(image, for: .normal)
         plusButton.alpha = isCompletedToday ? 0.3 : 1.0
+    }
+    
+    // проверка дата = сегоднядняя дата
+    func isCurrentDate(_ date: Date) -> Bool {
+        return Calendar.current.isDateInToday(date)
+    }
+    
+    // проверка даты сегодняшняя или прошедшая
+    func isPastOrCurrentDate(_ date: Date) -> Bool {
+        return date <= Date()
     }
     
     private func pluralizeDays(_ count: Int) -> String {

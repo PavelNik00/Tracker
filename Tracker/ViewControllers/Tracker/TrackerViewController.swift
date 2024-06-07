@@ -268,43 +268,33 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         if let selectedDaysString = selectedDaysString {
             let scheduleComponents = selectedDaysString.components(separatedBy: ", ")
             
-            for day in scheduleComponents {
-                if let categoryIndex = categories.firstIndex(where: { $0.header == selectedCategoryName }) {
-                    
-                    let category = categories[categoryIndex]
-                    let newHabit = Tracker(id: UUID(),
-                                           name: selectedHabitNameString ?? "Какое-то название :(",
-                                           color: selectedColorName ?? UIColor.black,
-                                           emoji: selectedEmojiString ?? "⭕️",
-                                           schedule: [day])
-                    
-                    var updateTrackerArray = category.trackers ?? []
-                    updateTrackerArray.append(newHabit)
-                    
-                    let updatedCategory = TrackerCategory(
-                        header: category.header,
-                        trackers: updateTrackerArray)
-                    
-                    categories[categoryIndex] = updatedCategory
-                    
-                } else {
-                    
-                    let newHabit = Tracker(
-                        id: UUID(),
-                        name: selectedHabitNameString ?? "Какое-то название :(",
-                        color: selectedColorName ?? UIColor.black,
-                        emoji: selectedEmojiString ?? "⭕️",
-                        schedule: [day])
-                    
-                    let newCategory = TrackerCategory(
-                        header: selectedCategoryName ?? "Неопознанная категория :(",
-                        trackers: [newHabit])
-                    
-                    categories.append(newCategory)
-                }
-                trackerCollectionView.reloadData()
-//                updateView()
+            let newHabit = Tracker(id: UUID(),
+                                   name: selectedHabitNameString ?? "Какое-то название :(",
+                                   color: selectedColorName ?? UIColor.black,
+                                   emoji: selectedEmojiString ?? "⭕️",
+                                   schedule: scheduleComponents)
+            
+            if let categoryIndex = categories.firstIndex(where: { $0.header == selectedCategoryName }) {
+                
+                let category = categories[categoryIndex]
+                var updateTrackerArray = category.trackers ?? []
+                updateTrackerArray.append(newHabit)
+                
+                let updatedCategory = TrackerCategory(
+                    header: category.header,
+                    trackers: updateTrackerArray)
+                
+                categories[categoryIndex] = updatedCategory
+                
+            } else {
+                
+                let newCategory = TrackerCategory(
+                    header: selectedCategoryName ?? "Неопознанная категория :(",
+                    trackers: [newHabit])
+                
+                categories.append(newCategory)
             }
+            trackerCollectionView.reloadData()
         }
         
         updateView()
@@ -339,17 +329,8 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
         
         let count = filterTrackers?.count ?? 0
         
-//        if count == 0 {
-//            setupErrorImage()
-//            setuplabelQuestion()
-//        } else {
-//            removeErrorImageAndLabelQuestion()
-//        }
-    
-//        trackerCollectionView.reloadData()
         print("Количество трекеров в секции \(section): \(count)")
         return count
-//        return category.trackers?.count ?? 0
     }
     
     // настройка ячейки
@@ -363,7 +344,6 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
         guard let tracker = cellData.trackers?[indexPath.row] else { return UICollectionViewCell() }
 
         // метод для фильтрации трекеров по дням недели
-
         let filterTrackers = cellData.trackers?.filter { tracker in
             let scheduleComponents = tracker.schedule
             let dayOfWeek = Calendar.current.component(.weekday, from: currentDate)
@@ -378,9 +358,7 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
         
         if let tracker = filterTrackers?[indexPath.row] {
             let isCompletedToday = isTrackerCompletedToday(id: tracker.id, at: indexPath)
-            let completedDays = completedTrackers.filter {
-                $0.id == tracker.id
-            }.count
+            let completedDays = getCompletedDaysCount(for: tracker)
             cell.configure(with: tracker,
                            isCompletedToday: isCompletedToday,
                            completedDays: completedDays,
@@ -394,6 +372,10 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
         return cell
     }
     
+    func getCompletedDaysCount(for tracker: Tracker) -> Int {
+        return completedTrackers.filter { $0.id == tracker.id }.count
+    }
+    
     // метод для вычисления завершен ли трекер сегодня или нет
     private func isTrackerCompletedToday(id: UUID, at indexPath: IndexPath) -> Bool {
         completedTrackers.contains { trackerRecord in
@@ -403,7 +385,7 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
     
     private func isSameTrackerRecord(trackerRecord: TrackerRecord, id: UUID) -> Bool {
         // проверка по дню, не учитывая время
-        let isSameDay = Calendar.current.isDate(trackerRecord.date, inSameDayAs: datePicker.date)
+        let isSameDay = Calendar.current.isDate(trackerRecord.date, inSameDayAs: currentDate)
         print("выполнена проверка на соответсвте id и даты")
         return trackerRecord.id == id && isSameDay
     }
@@ -480,8 +462,9 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
 // вызов делегата при нажатии на кнопку
 extension TrackerViewController: TrackerCollectionViewCellDelegate {
     
+    // метод для завершения трекера
     func completedTracker(id: UUID, at indexPath: IndexPath) {
-        let trackerRecord = TrackerRecord(id: id, date: datePicker.date)
+        let trackerRecord = TrackerRecord(id: id, date: currentDate)
         completedTrackers.append(trackerRecord) // добавиление в хранилище записей
         
         // обновление для одной ячейки
@@ -489,6 +472,7 @@ extension TrackerViewController: TrackerCollectionViewCellDelegate {
         print("Добавление \(id) в хранилище записей")
     }
     
+    // метод для отмены завершения трекера
     func uncompletedTracker(id: UUID, at indexPath: IndexPath) {
         completedTrackers.removeAll { trackerRecord in
             isSameTrackerRecord(trackerRecord: trackerRecord, id: id)
