@@ -11,7 +11,6 @@ protocol CreateNewCategoryViewControllerDelegate: AnyObject {
     func didCreatedCategory(_ createdCategory: TrackerCategory)
 }
 
-// класс для создания новой категории
 final class CreateNewCategoryViewController: UIViewController, UITextFieldDelegate {
     
     weak var delegate: CreateNewCategoryViewControllerDelegate?
@@ -126,7 +125,6 @@ final class CreateNewCategoryViewController: UIViewController, UITextFieldDelega
         readyButton.backgroundColor = UIColor(named: "Grey")
     }
     
-    // обрабатываем нажатие кнопки Готово
     @objc func createCategoryButton() {
         guard let newCategoryName = newCategoryTextField.text, !newCategoryName.isEmpty else { return }
         

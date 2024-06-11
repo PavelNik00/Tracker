@@ -9,25 +9,21 @@ import UIKit
 
 final class ScheduleViewController: UIViewController {
     
-    var arrayOfIndexes = [Int]() // для хранения индексов выбранных дней недели
-    // замыкание для передачи строки с расписанием обратно в NewHabitVC
+    var arrayOfIndexes = [Int]()
     var scheduleToPass: ( (String) -> Void )?
     
-    // скроллвью для возможности прокрутки содержимого
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         return scrollView
     }()
     
-    // для содержания внутри скроллвью
     private let contentView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
-    //заголовок для вью
     private let labelHeader: UILabel = {
         let label = UILabel()
         label.text = "Расписание"
@@ -38,13 +34,10 @@ final class ScheduleViewController: UIViewController {
         return label
     }()
     
-    // массив с названиями дней недели для таблицы
     let tableViewRows = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
     
-    // таблица для отображения дней недели
     private let tableView = UITableView()
     
-    // кнопка Готово для подтверждения выбора расписания
     private let readyButton: UIButton = {
         let button = UIButton()
         button.setTitle("Готово", for: .normal)
@@ -99,8 +92,7 @@ final class ScheduleViewController: UIViewController {
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-            //            contentView.heightAnchor.constraint(equalTo: scrollView.heightAnchor)
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
         ])
     }
     
@@ -113,7 +105,6 @@ final class ScheduleViewController: UIViewController {
         NSLayoutConstraint.activate([
             readyButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             readyButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            //            readyButton.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 20),
             readyButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -30),
             readyButton.heightAnchor.constraint(equalToConstant: 60)
         ])
@@ -127,7 +118,6 @@ final class ScheduleViewController: UIViewController {
         tableView.layer.cornerRadius = 16
         tableView.backgroundView?.backgroundColor = UIColor(named: "Light Grey")?.withAlphaComponent(0.3)
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
-        //        tableView.tableHeaderView = UIView()
         
         tableView.dataSource = self
         tableView.delegate = self
@@ -141,13 +131,11 @@ final class ScheduleViewController: UIViewController {
         ])
     }
     
-    // метод при нажатии на кнопку Готово
     @objc func readyButtonDidTap(_ sender: UIButton) {
         passScheduleToCreatingTrackerVC()
         dismiss(animated: true)
     }
     
-    // обработка нажатия свитча
     @objc func switchButtonChanged(_ sender: UISwitch) {
         
         guard let cell = sender.superview as? UITableViewCell,
@@ -157,7 +145,6 @@ final class ScheduleViewController: UIViewController {
         print("Switch button changed")
     }
     
-    // метод для добавления или удаления индекса в массиве хранения индексов дней недели
     func appendOrRemoveArray(sender: Bool, indexPath: IndexPath) {
         
         if sender == true {
@@ -167,7 +154,6 @@ final class ScheduleViewController: UIViewController {
         }
     }
     
-    // передаем выбранные дни недели в ячейку в NewHabitVC
     func passScheduleToCreatingTrackerVC() {
         var result = String()
         
@@ -204,7 +190,6 @@ extension ScheduleViewController: UITableViewDelegate, UITableViewDataSource {
         cell.accessoryView = switchButton
         cell.selectionStyle = .none
         
-        // Убираем сепаратор у последней ячейки
         if indexPath.row == tableViewRows.count - 1 {
             cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
         }
@@ -212,7 +197,6 @@ extension ScheduleViewController: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
-    // настраиваем высоту ячейки
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 75
     }

@@ -21,7 +21,6 @@ class StatisticViewController: UIViewController {
         setupStatisticTitle()
         setupNoStatisticImage()
         setupLabelQuestion()
-        
     }
     
     func setupStatisticTitle() {

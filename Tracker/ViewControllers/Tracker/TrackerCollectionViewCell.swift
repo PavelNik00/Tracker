@@ -8,13 +8,12 @@
 import UIKit
 
 protocol TrackerCollectionViewCellDelegate: AnyObject {
-    func completedTracker(id: UUID, at indexPath: IndexPath) // кнопка завершения
-    func uncompletedTracker(id: UUID, at indexPath: IndexPath) // кнопка галочки
+    func completedTracker(id: UUID, at indexPath: IndexPath)
+    func uncompletedTracker(id: UUID, at indexPath: IndexPath)
 }
 
 final class TrackerCollectionViewCell: UICollectionViewCell {
     
-    // делегат для обработки нажатия кнопки в ячейке
     weak var delegate: TrackerCollectionViewCellDelegate?
     
     var trackerCellView = UIView()
@@ -133,25 +132,21 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         ])
     }
     
-    // метод для создания ячейки
     func configure(with tracker: Tracker,
                    isCompletedToday: Bool,
                    completedDays: Int,
                    indexPath: IndexPath
     ) {
         self.isCompletedToday = isCompletedToday
-        self.trackerId = tracker.id // присваиваем id для ячейки
-        self.indexPath = indexPath // присваиваем индекс пути
+        self.trackerId = tracker.id
+        self.indexPath = indexPath
         
         titleLabel.text = tracker.name
         emojiLabel.text = tracker.emoji
         trackerCellView.backgroundColor = tracker.color
         plusButton.backgroundColor = tracker.color
         
-        // проверка для активности/неактивности кнопки добавления в TrackerRecord
-        // получаем ссылку на родительский VC
         if let currentDate = (superview as? UICollectionView)?.delegate as? TrackerViewController {
-            // если текущая дата в VC является сегодняшней или прошедшей, то
             if isPastOrCurrentDate(currentDate.currentDate) {
                 plusButton.isEnabled = true
             } else {
@@ -169,12 +164,10 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         plusButton.alpha = isCompletedToday ? 0.3 : 1.0
     }
     
-    // проверка дата = сегоднядняя дата
     func isCurrentDate(_ date: Date) -> Bool {
         return Calendar.current.isDateInToday(date)
     }
     
-    // проверка даты сегодняшняя или прошедшая
     func isPastOrCurrentDate(_ date: Date) -> Bool {
         return date <= Date()
     }
@@ -191,7 +184,6 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    // обработка нажатия на кнопку "+"
     @objc func plusButtonTapped() {
         guard let trackerId = trackerId,
               let indexPath = indexPath
@@ -204,6 +196,5 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         } else {
             delegate?.completedTracker(id: trackerId, at: indexPath)
         }
-        print("Нажата клавиша +")
     }
 }

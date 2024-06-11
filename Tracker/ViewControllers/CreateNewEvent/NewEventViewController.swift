@@ -16,18 +16,12 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
     
     weak var addCategoryDelegate: CategoryViewControllerDelegate?
     weak var eventCreateDelegate: NewEventCreateViewControllerDelegate?
-    //    weak var habitCreateDelegate: NewHabitCreateViewControllerDelegate?
     
     var selectedHabitName: [Tracker]? = []
-    
     var selectedDays: String?
-    
     var selectedCategory: String?
-    
     var selectedEmoji: String?
-    
     var selectedColor: UIColor?
-    
     var selectedCategoryStringForHabit: String?
     
     let datePicker = UIDatePicker()
@@ -141,7 +135,6 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // задаем заголовок для экрана
         self.title = "Новое нерегулярное событие"
         view.backgroundColor = .white
         
@@ -151,7 +144,6 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
         setupScrollView()
         setupContentView()
         
-        //        setupLabel()
         setupAddCategoryNameTextField()
         setuplimitTextLabel()
         
@@ -161,11 +153,9 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
         setupButtons()
         updateCreateButtonState()
         
-        // добавляем наблюдатель для свойства hidden у лейбла
         limitTextLabel.addObserver(self, forKeyPath: "hidden", options: [.old, .new], context: nil)
     }
     
-    // необходим чтобы избежать утечек памяти (при деинициализации контроллера)
     deinit {
         limitTextLabel.removeObserver(self, forKeyPath: "hidden")
     }
@@ -188,15 +178,6 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
         ])
     }
-    
-    //    func setupLabel() {
-    //        contentView.addSubview(label)
-    //
-    //        NSLayoutConstraint.activate([
-    //            label.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-    //            label.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 22),
-    //        ])
-    //    }
     
     func setuplimitTextLabel() {
         contentView.addSubview(limitTextLabel)
@@ -240,8 +221,7 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
         
         tableView.layer.cornerRadius = 16
         tableView.backgroundView?.backgroundColor = UIColor(named: "Light Grey")?.withAlphaComponent(0.3)
-        //        tableView.separatorInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
-        
+
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
@@ -251,7 +231,6 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
         
         if limitTextLabel.isHidden == true {
             NSLayoutConstraint.activate([
-                //                tableView.topAnchor.constraint(equalTo: addCategoryNameTextField.bottomAnchor, constant: 20),
                 tableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
                 tableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
                 tableView.heightAnchor.constraint(equalToConstant: 75),
@@ -319,7 +298,6 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
         ])
     }
     
-    // метод для обновления выбранной категории
     func didSelectCategory(_ selectedCategory: String?) {
         self.selectedCategoryStringForHabit = selectedCategory
         tableView.reloadData()
@@ -334,10 +312,8 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
         return daysOfWeek[weekDayIndex]
     }
     
-    // метод для активации кнопки "Создать" для привычки
     func updateCreateButtonState() {
         guard selectedCategory != nil ,
-              //              selectedDays != nil,
               selectedEmoji != nil,
               selectedColor != nil,
               addCategoryNameTextField.text?.isEmpty == false
@@ -350,24 +326,17 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
         addButton.backgroundColor = .black
     }
     
-    // обработка нажатия TextField
     @objc func addCategoryNameTextFieldEditing(_ textField: UITextField) {
         guard let enteredText = textField.text, !enteredText.isEmpty else { return }
         updateCreateButtonState()
-        print("Введен так \(enteredText)")
     }
     
-    // обработка нажатия кнопки "Отменить"
     @objc func cancelButtonDidTap() {
-        // закрываем экран
         self.dismiss(animated: true, completion: nil)
-        print("Нажата кнопка Отменить")
     }
     
-    // обработка нажатия кнопки "Создать" для cобытия
     @objc func addButtonDidTap() {
         
-        // прописываем создание события
         guard let selectedHabitName = addCategoryNameTextField.text, !selectedHabitName.isEmpty,
               let selectedCategoryString = selectedCategory,
               !selectedCategoryString.isEmpty,
@@ -387,10 +356,8 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
         
         let trackerCategoryString = TrackerCategory(header: selectedCategoryString, trackers: [tracker])
         
-        print("Перед вызовом делегата eventCreateDelegate: \(eventCreateDelegate != nil)")
         if let delegate = eventCreateDelegate {
             delegate.didCreateEvent(with: trackerCategoryString)
-            print("Вызов делегата на создании события")
         } else {
             print("Delegate не установлен")
         }
@@ -401,13 +368,10 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
     
     func finishCreatingEventAndDismiss() {
         dismiss(animated: false) {
-            print("Перед вызовом делегата didFinishCreatingEventAndDismiss: \(self.eventCreateDelegate != nil)")
             self.eventCreateDelegate?.didFinishCreatingEventAndDismiss()
-            print("Вызов делегата на чтобы закрыть событие")
         }
     }
     
-    // метод для наблюдателя
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == "hidden", let label = object as? UILabel {
             tableViewTopConstraint?.constant = label.isHidden ? 20 : 60
@@ -416,15 +380,12 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
             self.view.layoutIfNeeded()
         }
     }
-    
 }
 
-// настраиваем textField
 extension NewEventViewController: UITextFieldDelegate {
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         guard let text = textField.text else { return true }
-        // вычисляем предполагаемый текст
         let newText = (text as NSString).replacingCharacters(in: range, with: string)
         
         if newText.count <= 37 {
@@ -439,15 +400,12 @@ extension NewEventViewController: UITextFieldDelegate {
     }
 }
 
-// настройка таблицы
 extension NewEventViewController: UITableViewDataSource, UITableViewDelegate {
     
-    // количество ячеек
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
     }
     
-    // задаем параметры для ячейки
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "CategoryCell")
@@ -462,7 +420,6 @@ extension NewEventViewController: UITableViewDataSource, UITableViewDelegate {
         cell.layer.cornerRadius = 16
         cell.layer.masksToBounds = true
         cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
-        // настройка для картинки в ячейки
         let iconImage = UIImageView(frame: CGRect(x: 0, y: 0, width: 24, height: 24))
         iconImage.image = UIImage(named: "icon_next")
         cell.accessoryView = iconImage
@@ -472,12 +429,10 @@ extension NewEventViewController: UITableViewDataSource, UITableViewDelegate {
         return cell
     }
     
-    // настраиваем высоту ячейки
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 75
     }
     
-    // прописываем логику при нажатии на ячейки таблицы
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         let navigationVC = CategoryViewController()
@@ -491,10 +446,8 @@ extension NewEventViewController: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
-// настройка коллекции emoji
 extension NewEventViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
-    // настройка количества ячеек для коллекции
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == emojiCollection {
             emojiArray.count
@@ -503,7 +456,6 @@ extension NewEventViewController: UICollectionViewDataSource, UICollectionViewDe
         }
     }
     
-    // настройка ячейки коллекции
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if collectionView == emojiCollection {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "emojiCell", for: indexPath) as? EmojiCollectionViewCell
@@ -526,13 +478,11 @@ extension NewEventViewController: UICollectionViewDataSource, UICollectionViewDe
         }
     }
     
-    // настройка выделения ячейки коллекции при тапе на нее
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == emojiCollection {
             let cell = emojiCollection.cellForItem(at: indexPath)
             cell?.contentView.layer.cornerRadius = 16
             cell?.contentView.backgroundColor = UIColor(named: "Light Grey")
-            // выбор ячейки с емодзи
             selectedEmoji = emojiArray[indexPath.row]
             updateCreateButtonState()
             print("Выбран эмодзи \(selectedEmoji ?? "")")
@@ -541,14 +491,12 @@ extension NewEventViewController: UICollectionViewDataSource, UICollectionViewDe
             cell?.layer.borderWidth = 3
             cell?.layer.cornerRadius = 8
             cell?.layer.borderColor = colorArray[indexPath.row].cgColor
-            // выбор ячейки с цветом
             selectedColor = colorArray[indexPath.row]
             updateCreateButtonState()
             print("Выбран цвет \(selectedColor ?? UIColor.black)")
         }
     }
     
-    // настройка отмены выделения при тапе на другую ячейку в коллекции
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
         if collectionView == emojiCollection {
             let cell = emojiCollection.cellForItem(at: indexPath) as! EmojiCollectionViewCell
@@ -570,7 +518,6 @@ extension NewEventViewController: UICollectionViewDataSource, UICollectionViewDe
         }
     }
     
-    // настройка хедера
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let view = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header", for: indexPath) as! SupplementaryView
         if collectionView == emojiCollection {
@@ -581,17 +528,14 @@ extension NewEventViewController: UICollectionViewDataSource, UICollectionViewDe
         return view
     }
     
-    // настройка отступа коллекции от хедера
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0)
     }
     
-    // настройка размеров хедера
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: collectionView.frame.width, height: 50)
     }
     
-    // настройка отступа сверху для ячеек коллекции
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 10
     }
