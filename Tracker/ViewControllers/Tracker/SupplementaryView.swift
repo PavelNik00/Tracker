@@ -19,7 +19,7 @@ final class SupplementaryView: UICollectionReusableView {
         label.textAlignment = .left
         
         addSubview(label)
-        label.translatesAutoresizingMaskIntoConstraints = false 
+        label.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             label.topAnchor.constraint(equalTo: topAnchor, constant: 15),

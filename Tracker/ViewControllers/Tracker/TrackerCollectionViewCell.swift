@@ -194,11 +194,11 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     // обработка нажатия на кнопку "+"
     @objc func plusButtonTapped() {
         guard let trackerId = trackerId,
-                let indexPath = indexPath
+              let indexPath = indexPath
         else {
             assertionFailure("no trackerID")
             return }
-    
+        
         if isCompletedToday {
             delegate?.uncompletedTracker(id: trackerId, at: indexPath)
         } else {
@@ -206,5 +206,4 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         }
         print("Нажата клавиша +")
     }
-    
 }

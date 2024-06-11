@@ -15,7 +15,7 @@ final class ScheduleViewController: UIViewController {
     
     // скроллвью для возможности прокрутки содержимого
     private let scrollView: UIScrollView = {
-       let scrollView = UIScrollView()
+        let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         return scrollView
     }()
@@ -58,14 +58,14 @@ final class ScheduleViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-                
+        
         view.backgroundColor = .white
         
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
         
         self.title = "Расписание"
-
+        
         setupScrollView()
         setupContentView()
         setupLabelHeader()
@@ -100,7 +100,7 @@ final class ScheduleViewController: UIViewController {
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-//            contentView.heightAnchor.constraint(equalTo: scrollView.heightAnchor)
+            //            contentView.heightAnchor.constraint(equalTo: scrollView.heightAnchor)
         ])
     }
     
@@ -113,7 +113,7 @@ final class ScheduleViewController: UIViewController {
         NSLayoutConstraint.activate([
             readyButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             readyButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-//            readyButton.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 20),
+            //            readyButton.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 20),
             readyButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -30),
             readyButton.heightAnchor.constraint(equalToConstant: 60)
         ])
@@ -127,7 +127,7 @@ final class ScheduleViewController: UIViewController {
         tableView.layer.cornerRadius = 16
         tableView.backgroundView?.backgroundColor = UIColor(named: "Light Grey")?.withAlphaComponent(0.3)
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
-//        tableView.tableHeaderView = UIView()
+        //        tableView.tableHeaderView = UIView()
         
         tableView.dataSource = self
         tableView.delegate = self
@@ -146,10 +146,10 @@ final class ScheduleViewController: UIViewController {
         passScheduleToCreatingTrackerVC()
         dismiss(animated: true)
     }
-
+    
     // обработка нажатия свитча
     @objc func switchButtonChanged(_ sender: UISwitch) {
-
+        
         guard let cell = sender.superview as? UITableViewCell,
               let indexPath = tableView.indexPath(for: cell) else { return }
         let isOn = sender.isOn
@@ -196,7 +196,7 @@ extension ScheduleViewController: UITableViewDelegate, UITableViewDataSource {
         cell.textLabel?.font = .systemFont(ofSize: 17, weight: .regular)
         cell.textLabel?.textColor = .black
         cell.backgroundColor = UIColor(named: "Light Grey")?.withAlphaComponent(0.3)
-
+        
         let switchButton = UISwitch(frame: .zero)
         switchButton.onTintColor = UIColor(named: "Blue")
         switchButton.addTarget(self, action: #selector(switchButtonChanged), for: .valueChanged)

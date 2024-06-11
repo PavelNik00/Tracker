@@ -18,7 +18,7 @@ final class CategoryCell: UITableViewCell {
         addSubview(checkmarkImage)
         addSubview(categoryLabel)
         
-        self.heightAnchor.constraint(equalToConstant: 75).isActive = true 
+        self.heightAnchor.constraint(equalToConstant: 75).isActive = true
         
         categoryLabel.font = .systemFont(ofSize: 17, weight: .regular)
         categoryLabel.textColor = .black
@@ -28,7 +28,7 @@ final class CategoryCell: UITableViewCell {
         checkmarkImage.image = UIImage(named: "icon_done")
         checkmarkImage.contentMode = .center
         checkmarkImage.translatesAutoresizingMaskIntoConstraints = false
-
+        
         NSLayoutConstraint.activate([
             categoryLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
             categoryLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
@@ -44,5 +44,4 @@ final class CategoryCell: UITableViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
 }

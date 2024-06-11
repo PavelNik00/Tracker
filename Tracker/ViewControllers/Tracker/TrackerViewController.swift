@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class TrackerViewController: UIViewController, NewHabitCreateViewControllerDelegate {
+final class TrackerViewController: UIViewController, NewHabitCreateViewControllerDelegate, NewEventCreateViewControllerDelegate {
     
     // список категорий и вложенных в них трекеров
     var categories: [TrackerCategory] = []
@@ -27,7 +27,7 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
     let datePicker = UIDatePicker()
     var currentDate: Date = Date()
     
-//    lazy var selectedDate = datePicker.date
+    //    lazy var selectedDate = datePicker.date
     
     let errorImage = UIImageView()
     let labelQuestion = UILabel()
@@ -35,6 +35,7 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
     let searchBar = UISearchBar()
     
     let newHabitViewController = NewHabitViewController()
+    let newEventViewController = NewEventViewController()
     
     // массив для преобразования полученной даты из rus в eng
     let dayOfWeekMapping: [String: String] = [
@@ -72,9 +73,8 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         
         view.backgroundColor = .white
         
+        newEventViewController.eventCreateDelegate = self
         newHabitViewController.habitCreateDelegate = self
-//        setupErrorImage()
-//        setuplabelQuestion()
         
         setuplabelTrackerTitle()
         setupSearchBar()
@@ -85,7 +85,6 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         setupDatePicker()
     }
     
-    
     private func updateView() {
         if !isHabitExistsForSelectedDate() {
             setupErrorImage()
@@ -94,7 +93,7 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         } else {
             removeErrorImageAndLabelQuestion()
             setupTrackerCollectionView()
-//            trackerCollectionView.reloadData()
+            //            trackerCollectionView.reloadData()
             print("Загрузка коллекции")
         }
         trackerCollectionView.reloadData()
@@ -163,8 +162,9 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         datePicker.datePickerMode = .date
         datePicker.preferredDatePickerStyle = .compact
         datePicker.calendar.locale = Locale(identifier: "ru_RU")
+        
         datePicker.translatesAutoresizingMaskIntoConstraints = false
-        datePicker.widthAnchor.constraint(equalToConstant: 80).isActive = true
+        datePicker.widthAnchor.constraint(equalToConstant: 100).isActive = true
         datePicker.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .valueChanged)
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: datePicker)
     }
@@ -173,7 +173,7 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.placeholder = "Поиск"
         searchBar.barTintColor = UIColor(red: 118, green: 118, blue: 128, alpha: 0.12)
-
+        
         view.addSubview(searchBar)
         searchBar.topAnchor.constraint(equalTo: labelTrackerTitle.bottomAnchor, constant: 8).isActive = true
         searchBar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 8).isActive = true
@@ -190,11 +190,11 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         layout?.headerReferenceSize = CGSize(width: trackerCollectionView.frame.width, height: 50)
         
         trackerCollectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-
+        
         trackerCollectionView.register(TrackerCollectionViewCell.self, forCellWithReuseIdentifier: "TrackerCell")
         trackerCollectionView.register(TrackerCollectionSupplementaryView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "Header")
         
-//        trackerCollectionView.backgroundColor = .lightGrey
+        //        trackerCollectionView.backgroundColor = .lightGrey
         trackerCollectionView.delegate = self
         trackerCollectionView.dataSource = self
         
@@ -244,16 +244,21 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
     @objc func addButtonTapped() {
         let addNewVC = ChooseTypeOfTrackerVC()
         addNewVC.habitCreateDelegate = self
+        addNewVC.eventCreateDelegate = self
         let addNavigationController = UINavigationController(rootViewController: addNewVC)
         addNavigationController.modalPresentationStyle = .pageSheet
         present(addNavigationController, animated: true)
         print("Нажата клавиша создания привычки или события")
     }
     
-
     func didFinishCreatingHabitAndDismiss() {
         updateView()
-        print("Вызов делегата на трекерконтролере")
+        print("Вызов делегата на трекерконтролере для привычки")
+    }
+    
+    func didFinishCreatingEventAndDismiss() {
+        updateView()
+        print("Вызов делегата на трекерконтролере для события")
     }
     
     // метод для получения данных из NewHabitVC
@@ -299,7 +304,55 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         
         updateView()
         print("Добавлена новая категория в TrackerCategory")
-        print("Сработал делегат на TrackerVC")
+        print("Сработал делегат на TrackerVC для привычки")
+    }
+    
+    // метод для получения данных из NewEventVC
+    func didCreateEvent(with trackerCategoryString: TrackerCategory) {
+        print("didCreateEvent вызван с категорией: \(trackerCategoryString.header)")
+        
+        selectedHabitNameString = trackerCategoryString.trackers?.first?.name
+        selectedCategoryName = trackerCategoryString.header
+        selectedColorName = trackerCategoryString.trackers?.first?.color
+        selectedEmojiString = trackerCategoryString.trackers?.first?.emoji
+        selectedDaysString = trackerCategoryString.trackers?.first?.schedule.first
+        
+        if let selectedDaysString = selectedDaysString {
+            
+            let newEvent = Tracker(id: UUID(),
+                                   name: selectedHabitNameString ?? "Какое-то название :(",
+                                   color: selectedColorName ?? UIColor.black,
+                                   emoji: selectedEmojiString ?? "⭕️",
+                                   schedule: [selectedDaysString] )
+            
+            if let categoryIndex = categories.firstIndex(where: { $0.header == selectedCategoryName }) {
+                
+                let category = categories[categoryIndex]
+                var updateTrackerArray = category.trackers ?? []
+                updateTrackerArray.append(newEvent)
+                
+                let updatedCategory = TrackerCategory(
+                    header: category.header,
+                    trackers: updateTrackerArray)
+                
+                categories[categoryIndex] = updatedCategory
+                
+            } else {
+                
+                let newCategory = TrackerCategory(
+                    header: selectedCategoryName ?? "Неопознанная категория :(",
+                    trackers: [newEvent])
+                
+                categories.append(newCategory)
+            }
+            trackerCollectionView.reloadData()
+            
+            updateView()
+            print("Добавлена новое событие в TrackerCategory")
+            print("Сработал делегат на TrackerVC для события")
+        } else {
+            print("Ошибка: не удалось получить дату из расписания")
+        }
     }
 }
 
@@ -342,7 +395,7 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
         cell.delegate = self
         let cellData = categories[indexPath.section]
         guard let tracker = cellData.trackers?[indexPath.row] else { return UICollectionViewCell() }
-
+        
         // метод для фильтрации трекеров по дням недели
         let filterTrackers = cellData.trackers?.filter { tracker in
             let scheduleComponents = tracker.schedule
@@ -394,7 +447,7 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "Header", for: indexPath) as! TrackerCollectionSupplementaryView
-         
+        
         let category = categories[indexPath.section]
         let filterTrackers = category.trackers?.filter { tracker in
             let scheduleComponents = tracker.schedule
@@ -411,7 +464,7 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
         if filterTrackers?.isEmpty == false  {
             header.titleLabel.text = categories[indexPath.section].header
         } else {
-                header.titleLabel.text = nil
+            header.titleLabel.text = nil
         }
         
         return header
@@ -437,7 +490,7 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
     
     // настраиваем размер хедера
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-
+        
         let category = categories[section]
         let filterTrackers = category.trackers?.filter { tracker in
             let scheduleComponents = tracker.schedule
@@ -456,7 +509,6 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
             return CGSize(width: collectionView.bounds.width, height: 0)
         }
     }
-    
 }
 
 // вызов делегата при нажатии на кнопку
@@ -479,6 +531,6 @@ extension TrackerViewController: TrackerCollectionViewCellDelegate {
         }
         trackerCollectionView.reloadItems(at: [indexPath])
         print("Удаление \(id) из хранилища записей")
-
+        
     }
 }

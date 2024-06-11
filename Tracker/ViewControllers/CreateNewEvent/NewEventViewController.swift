@@ -1,21 +1,22 @@
 //
-//  NewHabitViewController.swift
+//  NewEventViewController.swift
 //  Tracker
 //
-//  Created by Pavel Nikipelov on 20.05.2024.
+//  Created by Pavel Nikipelov on 07.06.2024.
 //
 
 import UIKit
 
-protocol NewHabitCreateViewControllerDelegate: AnyObject {
-    func didCreateHabit(with trackerCategoryString: TrackerCategory)
-    func didFinishCreatingHabitAndDismiss()
+protocol NewEventCreateViewControllerDelegate: AnyObject {
+    func didCreateEvent(with trackerCategoryString: TrackerCategory)
+    func didFinishCreatingEventAndDismiss()
 }
 
-final class NewHabitViewController: UIViewController, CategoryViewControllerDelegate {
+final class NewEventViewController: UIViewController, CategoryViewControllerDelegate {
     
     weak var addCategoryDelegate: CategoryViewControllerDelegate?
-    weak var habitCreateDelegate: NewHabitCreateViewControllerDelegate?
+    weak var eventCreateDelegate: NewEventCreateViewControllerDelegate?
+    //    weak var habitCreateDelegate: NewHabitCreateViewControllerDelegate?
     
     var selectedHabitName: [Tracker]? = []
     
@@ -28,6 +29,9 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
     var selectedColor: UIColor?
     
     var selectedCategoryStringForHabit: String?
+    
+    let datePicker = UIDatePicker()
+    var currentDate: Date = Date()
     
     var onDismiss: (() -> Void)?
     
@@ -65,7 +69,7 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
     
     private let label: UILabel = {
         let label = UILabel()
-        label.text = "Новая привычка"
+        label.text = "Новое нерегулярное событие"
         label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textColor = .black
         label.textAlignment = .center
@@ -75,7 +79,7 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
     
     private let addCategoryNameTextField = UITextField()
     
-    let tableViewRows = ["Категория", "Расписание"]
+    let tableViewRows = "Категория"
     private let tableView = UITableView()
     
     let emojiArray = ["🙂","😻","🌺","🐶","❤️","😱",
@@ -138,7 +142,7 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         super.viewDidLoad()
         
         // задаем заголовок для экрана
-        self.title = "Новая привычка"
+        self.title = "Новое нерегулярное событие"
         view.backgroundColor = .white
         
         view.addSubview(scrollView)
@@ -236,7 +240,7 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         
         tableView.layer.cornerRadius = 16
         tableView.backgroundView?.backgroundColor = UIColor(named: "Light Grey")?.withAlphaComponent(0.3)
-        tableView.separatorInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
+        //        tableView.separatorInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
         
         tableView.dataSource = self
         tableView.delegate = self
@@ -250,7 +254,7 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
                 //                tableView.topAnchor.constraint(equalTo: addCategoryNameTextField.bottomAnchor, constant: 20),
                 tableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
                 tableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-                tableView.heightAnchor.constraint(equalToConstant: 150),
+                tableView.heightAnchor.constraint(equalToConstant: 75),
             ])
         }
     }
@@ -322,10 +326,18 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         updateCreateButtonState()
     }
     
+    func getCurrentDayInRussian() -> String? {
+        let daysOfWeek = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"]
+        let currentDate = Date()
+        let calendar = Calendar.current
+        let weekDayIndex = calendar.component(.weekday, from: currentDate) - 1
+        return daysOfWeek[weekDayIndex]
+    }
+    
     // метод для активации кнопки "Создать" для привычки
     func updateCreateButtonState() {
         guard selectedCategory != nil ,
-              selectedDays != nil,
+              //              selectedDays != nil,
               selectedEmoji != nil,
               selectedColor != nil,
               addCategoryNameTextField.text?.isEmpty == false
@@ -352,39 +364,46 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         print("Нажата кнопка Отменить")
     }
     
-    // обработка нажатия кнопки "Создать" для привычки
+    // обработка нажатия кнопки "Создать" для cобытия
     @objc func addButtonDidTap() {
-        // прописываем создание привычки
+        
+        // прописываем создание события
         guard let selectedHabitName = addCategoryNameTextField.text, !selectedHabitName.isEmpty,
               let selectedCategoryString = selectedCategory,
               !selectedCategoryString.isEmpty,
               let selectedColorSting = selectedColor,
-              let selectedEmojiString = selectedEmoji, !selectedEmojiString.isEmpty,
-              let selectedDays = selectedDays
+              let selectedEmojiString = selectedEmoji, !selectedEmojiString.isEmpty
         else {
             print("Чего-то не хватает")
             return
         }
         
-        let scheduleComponents = selectedDays.components(separatedBy: ", ").map { $0.trimmingCharacters(in: .whitespaces) }
+        guard let selectedDays = getCurrentDayInRussian() else {
+            print("Не удалось получить текущий день недели")
+            return
+        }
         
-        let tracker = Tracker(id: UUID(), name: selectedHabitName, color: selectedColorSting, emoji: selectedEmojiString, schedule: scheduleComponents)
+        let tracker = Tracker(id: UUID(), name: selectedHabitName, color: selectedColorSting, emoji: selectedEmojiString, schedule: [selectedDays] )
         
         let trackerCategoryString = TrackerCategory(header: selectedCategoryString, trackers: [tracker])
         
-        if let delegate = habitCreateDelegate {
-            delegate.didCreateHabit(with: trackerCategoryString)
-            print("Вызов делегата на создании привычки")
+        print("Перед вызовом делегата eventCreateDelegate: \(eventCreateDelegate != nil)")
+        if let delegate = eventCreateDelegate {
+            delegate.didCreateEvent(with: trackerCategoryString)
+            print("Вызов делегата на создании события")
+        } else {
+            print("Delegate не установлен")
         }
         
-        finishCreatingHabitAndDismiss()
-        print("✅ Новая привычка c названием категории \(selectedCategoryString), названием привычки \(selectedHabitName), выбранным эмодзи \(selectedEmojiString), выбранным цветом \(selectedColorSting), и выбранными днями \(scheduleComponents) создана")
+        finishCreatingEventAndDismiss()
+        print("✅ Новое событие c названием категории \(selectedCategoryString), названием привычки \(selectedHabitName), выбранным эмодзи \(selectedEmojiString), выбранным цветом \(selectedColorSting), и выбранными днями \(selectedDays) создана")
     }
     
-    func finishCreatingHabitAndDismiss() {
+    func finishCreatingEventAndDismiss() {
         dismiss(animated: false) {
-            self.habitCreateDelegate?.didFinishCreatingHabitAndDismiss()
-            print("Вызов делегата на чтобы закрыть привычкувью")
+            print("Перед вызовом делегата didFinishCreatingEventAndDismiss: \(self.eventCreateDelegate != nil)")
+            self.eventCreateDelegate?.didFinishCreatingEventAndDismiss()
+            print("Вызов делегата на чтобы закрыть событие")
         }
     }
     
@@ -401,7 +420,7 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
 }
 
 // настраиваем textField
-extension NewHabitViewController: UITextFieldDelegate {
+extension NewEventViewController: UITextFieldDelegate {
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         guard let text = textField.text else { return true }
@@ -421,63 +440,36 @@ extension NewHabitViewController: UITextFieldDelegate {
 }
 
 // настройка таблицы
-extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
+extension NewEventViewController: UITableViewDataSource, UITableViewDelegate {
     
     // количество ячеек
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return tableViewRows.count
+        return 1
     }
     
     // задаем параметры для ячейки
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableViewRows[indexPath.row]
-        if cell == "Категория" {
-            let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "CategoryCell")
-            cell.textLabel?.text = tableViewRows[indexPath.row]
-            cell.textLabel?.font = .systemFont(ofSize: 17, weight: .regular)
-            cell.textLabel?.textColor = .black
-            cell.detailTextLabel?.font = .systemFont(ofSize: 17, weight: .regular)
-            cell.detailTextLabel?.textColor = .black
-            cell.detailTextLabel?.text = selectedCategory ?? ""
-            cell.backgroundColor = UIColor(named: "Light Grey")?.withAlphaComponent(0.3)
-            cell.selectionStyle = .none
-            
-            // настройка для картинки в ячейки
-            let iconImage = UIImageView(frame: CGRect(x: 0, y: 0, width: 24, height: 24))
-            iconImage.image = UIImage(named: "icon_next")
-            cell.accessoryView = iconImage
-            
-            // Убираем сепаратор у последней ячейки
-            if indexPath.row == tableViewRows.count - 1 {
-                cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
-                
-            }
-            
-            updateCreateButtonState()
-            return cell
-        } else {
-            let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
-            cell.textLabel?.text = tableViewRows[indexPath.row]
-            cell.textLabel?.font = .systemFont(ofSize: 17, weight: .regular)
-            cell.textLabel?.textColor = .black
-            cell.detailTextLabel?.font = .systemFont(ofSize: 17, weight: .regular)
-            cell.detailTextLabel?.textColor = .black
-            cell.detailTextLabel?.text = selectedDays ?? ""
-            cell.backgroundColor = UIColor(named: "Light Grey")?.withAlphaComponent(0.3)
-            cell.selectionStyle = .none
-            
-            // настройка для картинки в ячейки
-            let iconImage = UIImageView(frame: CGRect(x: 0, y: 0, width: 24, height: 24))
-            iconImage.image = UIImage(named: "icon_next")
-            cell.accessoryView = iconImage
-            
-            // Убираем сепаратор у последней ячейки
-            if indexPath.row == tableViewRows.count - 1 {
-                cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
-            }
-            updateCreateButtonState()
-            return cell
-        }
+        
+        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "CategoryCell")
+        cell.textLabel?.text = "Категория"
+        cell.textLabel?.font = .systemFont(ofSize: 17, weight: .regular)
+        cell.textLabel?.textColor = .black
+        cell.detailTextLabel?.font = .systemFont(ofSize: 17, weight: .regular)
+        cell.detailTextLabel?.textColor = .black
+        cell.detailTextLabel?.text = selectedCategory ?? ""
+        cell.backgroundColor = UIColor(named: "Light Grey")?.withAlphaComponent(0.3)
+        cell.selectionStyle = .none
+        cell.layer.cornerRadius = 16
+        cell.layer.masksToBounds = true
+        cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
+        // настройка для картинки в ячейки
+        let iconImage = UIImageView(frame: CGRect(x: 0, y: 0, width: 24, height: 24))
+        iconImage.image = UIImage(named: "icon_next")
+        cell.accessoryView = iconImage
+        
+        updateCreateButtonState()
+        
+        return cell
     }
     
     // настраиваем высоту ячейки
@@ -487,32 +479,20 @@ extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
     
     // прописываем логику при нажатии на ячейки таблицы
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let cell = tableViewRows[indexPath.row]
-        if cell == "Категория" {
-            let navigationVC = CategoryViewController()
-            navigationVC.categoryToPass = { [weak self]  selectedCategory in
-                self?.selectedCategory = selectedCategory
-                tableView.reloadRows(at: [indexPath], with: .automatic)
-                print("✅ Категория \(selectedCategory) добавлена в таблицу")
-            }
-            navigationVC.modalPresentationStyle = .pageSheet
-            present(navigationVC, animated: true)
-            //            print("Button Категория tapped")
-        } else {
-            let navigationVC = ScheduleViewController()
-            navigationVC.scheduleToPass = { [weak self] selectedDays in
-                self?.selectedDays = selectedDays
-                tableView.reloadRows(at: [indexPath], with: .automatic)
-            }
-            navigationVC.modalPresentationStyle = .pageSheet
-            present(navigationVC, animated: true)
-            print("✅ Дата добавлена")
+        
+        let navigationVC = CategoryViewController()
+        navigationVC.categoryToPass = { [weak self]  selectedCategory in
+            self?.selectedCategory = selectedCategory
+            tableView.reloadRows(at: [indexPath], with: .automatic)
+            print("✅ Категория \(selectedCategory) добавлена в таблицу")
         }
+        navigationVC.modalPresentationStyle = .pageSheet
+        present(navigationVC, animated: true)
     }
 }
 
 // настройка коллекции emoji
-extension NewHabitViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+extension NewEventViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
     // настройка количества ячеек для коллекции
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -616,3 +596,4 @@ extension NewHabitViewController: UICollectionViewDataSource, UICollectionViewDe
         return 10
     }
 }
+

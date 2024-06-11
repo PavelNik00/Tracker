@@ -13,7 +13,7 @@ protocol CategoryViewControllerDelegate: AnyObject {
 
 // класс для страницы Категория
 final class CategoryViewController: UIViewController, CreateNewCategoryViewControllerDelegate {
-        
+    
     weak var delegate: CategoryViewControllerDelegate?
     var categoryToPass: ( (String) -> Void )?
     var categories: [TrackerCategory] = []
@@ -33,7 +33,7 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
         label.textAlignment = .center
         return label
     }()
-        
+    
     private let errorImage = UIImageView()
     private let labelText = UILabel()
     
@@ -58,16 +58,16 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
         setupLabelHeader()
         setupScreen()
         setupAddCategoryButton()
-
+        
     }
     
     private func setupCategoryTableView() {
         view.addSubview(categoryTableView)
-
-//        categoryTableView.layer.cornerRadius = 16
-//        categoryTableView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner]
-//        categoryTableView.clipsToBounds = true
-//        categoryTableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        
+        //        categoryTableView.layer.cornerRadius = 16
+        //        categoryTableView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        //        categoryTableView.clipsToBounds = true
+        //        categoryTableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         categoryTableView.register(CategoryCell.self, forCellReuseIdentifier: "CategoryCell")
         
         categoryTableView.translatesAutoresizingMaskIntoConstraints = false
@@ -116,7 +116,7 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
         labelText.textColor = .black
         labelText.numberOfLines = 0
         labelText.lineBreakMode = .byWordWrapping
-//        labelText.sizeToFit()
+        //        labelText.sizeToFit()
         labelText.textAlignment = .center
         
         view.addSubview(labelText)
@@ -155,9 +155,9 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
         let trackerCategory = TrackerCategory(header: selectedCategory, trackers: nil)
         categories.append(trackerCategory)
         categoryToPass?(trackerCategory.header)
-//        navigationController?.popViewController(animated: true)
+        //        navigationController?.popViewController(animated: true)
         setupCategoryTableView()
-
+        
         if let navigationController = self.navigationController {
             navigationController.popViewController(animated: true)
         } else {
@@ -169,7 +169,7 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
     }
     
     @objc func addCategoryButton() {
- 
+        
         if isCheckmarkImageSelected == true {
             guard let selectedCategory = selectedCategory else { return }
             passCategoryToCreatingTrackerVC(selectedCategory: selectedCategory)
@@ -182,7 +182,7 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
             present(navigationViewController, animated: true)
             print("Button Добавить категорию tapped")
             print(#fileID, #function, #line)
-              
+            
         }
     }
     
@@ -219,7 +219,7 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
         } else {
             cell.checkmarkImage.isHidden = true
         }
-         
+        
         // реализация добавления ячеек в таблиц
         let isLast = indexPath.row == (categories.count - 1)
         let isFirst = indexPath.row == 0
@@ -239,7 +239,7 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
             cell.layer.cornerRadius = 0
             cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         }
-
+        
         return cell
     }
     
@@ -249,7 +249,7 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
         
         // установка чекмарка на ячейке
         if let selectedIndexPath = selectedIndexPath,
-        let selectedCell = tableView.cellForRow(at: selectedIndexPath) as? CategoryCell {
+           let selectedCell = tableView.cellForRow(at: selectedIndexPath) as? CategoryCell {
             selectedCell.checkmarkImage.isHidden = true
             updateCategoryButtonTitle()
             tableView.reloadData()
@@ -271,6 +271,4 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
         let categoryButton = view.subviews.compactMap { $0 as? UIButton }.first
         categoryButton?.setTitle(isCheckmarkImageSelected ? "Готово" : "Добавить категорию", for: .normal)
     }
-    
-    
 }
