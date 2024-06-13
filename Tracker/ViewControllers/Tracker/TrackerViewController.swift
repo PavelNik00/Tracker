@@ -14,9 +14,11 @@ import UIKit
 
 final class TrackerViewController: UIViewController, NewHabitCreateViewControllerDelegate, NewEventCreateViewControllerDelegate {
     
+    // список категорий и вложенных в них трекеров
     var categories: [TrackerCategory] = []
     var newHabit: [Tracker]
     
+    // трекеры, которые были выполнены в выбранную дату хранятся здесь
     var completedTrackers: [TrackerRecord] = []
     
     var trackerID: UUID?
@@ -38,6 +40,7 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
     let newHabitViewController = NewHabitViewController()
     let newEventViewController = NewEventViewController()
     
+    // массив для преобразования полученной даты из rus в eng
     let dayOfWeekMapping: [String: String] = [
         "Пн" : "Monday",
         "Вт": "Tuesday",
@@ -82,7 +85,6 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         updateView()
         
         setupNavigationBar()
-        setupDatePicker()
     }
     
     private func updateView() {
@@ -147,9 +149,6 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         addButton.tintColor = .black
         navigationItem.leftBarButtonItem = addButton
         
-    }
-    
-    func setupDatePicker() {
         let datePicker = UIDatePicker()
         
         let currentDate = Date()
@@ -194,7 +193,7 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         trackerCollectionView.register(TrackerCollectionViewCell.self, forCellWithReuseIdentifier: "TrackerCell")
         trackerCollectionView.register(TrackerCollectionSupplementaryView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "Header")
         
-        //        trackerCollectionView.backgroundColor = .lightGrey
+        // trackerCollectionView.backgroundColor = .lightGrey
         trackerCollectionView.delegate = self
         trackerCollectionView.dataSource = self
         
@@ -218,8 +217,10 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         }
         
         updateView()
+        print("Выбранная дата: \(formattedDate)")
     }
     
+    // метод для обновления ячейки, есть ли привычка для выбранного дня или нет. Используется для обновления UI - отображения заглушки/коллекции
     private func isHabitExistsForSelectedDate() -> Bool {
         for category in categories {
             if let trackers = category.trackers {
@@ -246,16 +247,20 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         let addNavigationController = UINavigationController(rootViewController: addNewVC)
         addNavigationController.modalPresentationStyle = .pageSheet
         present(addNavigationController, animated: true)
+        print("Нажата клавиша создания привычки или события")
     }
     
     func didFinishCreatingHabitAndDismiss() {
         updateView()
+        print("Вызов делегата на трекерконтролере для привычки")
     }
     
     func didFinishCreatingEventAndDismiss() {
         updateView()
+        print("Вызов делегата на трекерконтролере для события")
     }
     
+    // метод для получения данных из NewHabitVC
     func didCreateHabit(with trackerCategoryString: TrackerCategory) {
         
         selectedHabitNameString = trackerCategoryString.trackers?.first?.name
@@ -297,10 +302,13 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         }
         
         updateView()
+        print("Добавлена новая категория в TrackerCategory")
+        print("Сработал делегат на TrackerVC для привычки")
     }
     
     // метод для получения данных из NewEventVC
     func didCreateEvent(with trackerCategoryString: TrackerCategory) {
+        print("didCreateEvent вызван с категорией: \(trackerCategoryString.header)")
         
         selectedHabitNameString = trackerCategoryString.trackers?.first?.name
         selectedCategoryName = trackerCategoryString.header
@@ -340,6 +348,7 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
             
             updateView()
             print("Добавлена новое событие в TrackerCategory")
+            print("Сработал делегат на TrackerVC для события")
         } else {
             print("Ошибка: не удалось получить дату из расписания")
         }
@@ -429,6 +438,7 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
     private func isSameTrackerRecord(trackerRecord: TrackerRecord, id: UUID) -> Bool {
         // проверка по дню, не учитывая время
         let isSameDay = Calendar.current.isDate(trackerRecord.date, inSameDayAs: currentDate)
+        print("выполнена проверка на соответсвте id и даты")
         return trackerRecord.id == id && isSameDay
     }
     

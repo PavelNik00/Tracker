@@ -11,6 +11,7 @@ protocol CategoryViewControllerDelegate: AnyObject {
     func didSelectCategory(_ selectedCategory: String?)
 }
 
+// класс для страницы Категория
 final class CategoryViewController: UIViewController, CreateNewCategoryViewControllerDelegate {
     
     weak var delegate: CategoryViewControllerDelegate?
@@ -71,7 +72,6 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
         categoryTableView.dataSource = self
         categoryTableView.delegate = self
         
-        
         NSLayoutConstraint.activate([
             categoryTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             categoryTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
@@ -111,6 +111,7 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
         labelText.textColor = .black
         labelText.numberOfLines = 0
         labelText.lineBreakMode = .byWordWrapping
+        //        labelText.sizeToFit()
         labelText.textAlignment = .center
         
         view.addSubview(labelText)
@@ -149,7 +150,6 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
         let trackerCategory = TrackerCategory(header: selectedCategory, trackers: nil)
         categories.append(trackerCategory)
         categoryToPass?(trackerCategory.header)
-        //        navigationController?.popViewController(animated: true)
         setupCategoryTableView()
         
         if let navigationController = self.navigationController {
@@ -193,12 +193,15 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
     }
 }
 
+// настройка таблицы с созданными категориями
 extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
     
+    // количество категорий
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         categories.count
     }
     
+    // настройка ячейки категории
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath) as! CategoryCell
         
@@ -211,6 +214,7 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
             cell.checkmarkImage.isHidden = true
         }
         
+        // реализация добавления ячеек в таблиц
         let isLast = indexPath.row == (categories.count - 1)
         let isFirst = indexPath.row == 0
         
@@ -233,9 +237,11 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
+    // настройка ячейки при ее выделении
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
+        // установка чекмарка на ячейке
         if let selectedIndexPath = selectedIndexPath,
            let selectedCell = tableView.cellForRow(at: selectedIndexPath) as? CategoryCell {
             selectedCell.checkmarkImage.isHidden = true
@@ -243,6 +249,7 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
             tableView.reloadData()
         }
         
+        // установка чекмарка но новой ячейке
         if let cell = tableView.cellForRow(at: indexPath) as? CategoryCell {
             cell.checkmarkImage.isHidden = false
             isCheckmarkImageSelected = !cell.checkmarkImage.isHidden
@@ -253,6 +260,7 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
     
+    // обновление кнопки Готово
     private func updateCategoryButtonTitle() {
         let categoryButton = view.subviews.compactMap { $0 as? UIButton }.first
         categoryButton?.setTitle(isCheckmarkImageSelected ? "Готово" : "Добавить категорию", for: .normal)

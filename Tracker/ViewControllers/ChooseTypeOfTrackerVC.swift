@@ -79,6 +79,7 @@ final class ChooseTypeOfTrackerVC: UIViewController, NewHabitCreateViewControlle
             addNewIrregEventButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             addNewIrregEventButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
         ])
+        
     }
     
     @objc func setupNewHabitButton() {
@@ -87,6 +88,7 @@ final class ChooseTypeOfTrackerVC: UIViewController, NewHabitCreateViewControlle
         let addNavigationController = UINavigationController(rootViewController: addNewHabitVC)
         addNavigationController.modalPresentationStyle = .pageSheet
         present(addNavigationController, animated: true)
+        print("Habit button tapped")
     }
     
     @objc func setupNewEventButton() {
@@ -95,6 +97,7 @@ final class ChooseTypeOfTrackerVC: UIViewController, NewHabitCreateViewControlle
         let addNavigationController = UINavigationController(rootViewController: addNewEventVC)
         addNavigationController.modalPresentationStyle = .pageSheet
         present(addNavigationController, animated: true)
+        print("Irregular Event button tapped")
     }
     
     func didCreateHabit(with trackerCategoryString: TrackerCategory) {
@@ -103,6 +106,7 @@ final class ChooseTypeOfTrackerVC: UIViewController, NewHabitCreateViewControlle
     
     func didCreateEvent(with trackerCategoryString: TrackerCategory) {
         self.eventCreateDelegate?.didCreateEvent(with: trackerCategoryString)
+        print("Вызов делегата на создании события выборпривычкаилисобытие")
     }
     
     func didFinishCreatingHabitAndDismiss() {
@@ -114,6 +118,7 @@ final class ChooseTypeOfTrackerVC: UIViewController, NewHabitCreateViewControlle
         dismiss(animated: true) {
             self.habitCreateDelegate?.didFinishCreatingHabitAndDismiss()
         }
+        print("Вызов делегата на выборпривычкалилисобытие для привычки")
     }
     
     func didFinishCreatingEventAndDismiss() {
@@ -125,5 +130,6 @@ final class ChooseTypeOfTrackerVC: UIViewController, NewHabitCreateViewControlle
         dismiss(animated: true) {
             self.eventCreateDelegate?.didFinishCreatingEventAndDismiss()
         }
+        print("Вызов делегата на выборпривычкалилисобытие для события")
     }
 }

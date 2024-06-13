@@ -7,6 +7,7 @@
 
 import UIKit
 
+// сущность для хранения информации про трекер (привычка или нерегулярного события)
 struct Tracker {
     let id: UUID
     let name: String

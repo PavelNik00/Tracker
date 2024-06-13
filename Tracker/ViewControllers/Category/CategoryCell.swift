@@ -38,6 +38,7 @@ final class CategoryCell: UITableViewCell {
             checkmarkImage.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
             checkmarkImage.widthAnchor.constraint(equalToConstant: 24)
         ])
+        
     }
     
     required init?(coder: NSCoder) {
