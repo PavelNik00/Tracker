@@ -7,7 +7,13 @@
 
 import UIKit
 
-final class ChooseTypeOfTrackerVC: UIViewController {
+final class ChooseTypeOfTrackerVC: UIViewController, NewHabitCreateViewControllerDelegate, NewEventCreateViewControllerDelegate {
+    
+    weak var habitCreateDelegate: NewHabitCreateViewControllerDelegate?
+    weak var eventCreateDelegate: NewEventCreateViewControllerDelegate?
+    
+    var didFinishCreatingHabitAndDismissCalled = false
+    var didFinishCreatingEventAndDismissCalled = false
     
     private let label: UILabel = {
         let label = UILabel()
@@ -47,7 +53,7 @@ final class ChooseTypeOfTrackerVC: UIViewController {
         view.backgroundColor = .white
         
         addNewHabitButton.addTarget(self, action: #selector(setupNewHabitButton), for: .touchUpInside)
-        addNewIrregEventButton.addTarget(self, action: #selector(setupIrregEventButton), for: .touchUpInside)
+        addNewIrregEventButton.addTarget(self, action: #selector(setupNewEventButton), for: .touchUpInside)
         
         addNewHabitButton.translatesAutoresizingMaskIntoConstraints = false
         addNewIrregEventButton.translatesAutoresizingMaskIntoConstraints = false
@@ -73,14 +79,51 @@ final class ChooseTypeOfTrackerVC: UIViewController {
             addNewIrregEventButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             addNewIrregEventButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
         ])
-
     }
     
     @objc func setupNewHabitButton() {
-        print("Habit button tapped")
+        let addNewHabitVC = NewHabitViewController()
+        addNewHabitVC.habitCreateDelegate = self
+        let addNavigationController = UINavigationController(rootViewController: addNewHabitVC)
+        addNavigationController.modalPresentationStyle = .pageSheet
+        present(addNavigationController, animated: true)
     }
     
-    @objc func setupIrregEventButton() {
-        print("Irregular Event button tapped")
+    @objc func setupNewEventButton() {
+        let addNewEventVC = NewEventViewController()
+        addNewEventVC.eventCreateDelegate = self
+        let addNavigationController = UINavigationController(rootViewController: addNewEventVC)
+        addNavigationController.modalPresentationStyle = .pageSheet
+        present(addNavigationController, animated: true)
+    }
+    
+    func didCreateHabit(with trackerCategoryString: TrackerCategory) {
+        self.habitCreateDelegate?.didCreateHabit(with: trackerCategoryString)
+    }
+    
+    func didCreateEvent(with trackerCategoryString: TrackerCategory) {
+        self.eventCreateDelegate?.didCreateEvent(with: trackerCategoryString)
+    }
+    
+    func didFinishCreatingHabitAndDismiss() {
+        guard !didFinishCreatingHabitAndDismissCalled else {
+            return
+        }
+        didFinishCreatingHabitAndDismissCalled = true
+        
+        dismiss(animated: true) {
+            self.habitCreateDelegate?.didFinishCreatingHabitAndDismiss()
+        }
+    }
+    
+    func didFinishCreatingEventAndDismiss() {
+        guard !didFinishCreatingEventAndDismissCalled else {
+            return
+        }
+        didFinishCreatingEventAndDismissCalled = true
+        
+        dismiss(animated: true) {
+            self.eventCreateDelegate?.didFinishCreatingEventAndDismiss()
+        }
     }
 }
