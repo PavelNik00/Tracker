@@ -18,22 +18,17 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
     weak var habitCreateDelegate: NewHabitCreateViewControllerDelegate?
     
     var selectedHabitName: [Tracker]? = []
-    
-    var selectedDays: String?
-    
-    var selectedCategory: String?
-    
-    var selectedEmoji: String?
-    
-    var selectedColor: UIColor?
-    
-    var selectedCategoryStringForHabit: String?
-    
     var onDismiss: (() -> Void)?
+
+    private var selectedDays: String?
+    private var selectedCategory: String?
+    private var selectedEmoji: String?
+    private var selectedColor: UIColor?
+    private var selectedCategoryStringForHabit: String?
     
     private var tableViewTopConstraint: NSLayoutConstraint?
     
-    let limitTextLabel: UILabel = {
+    private let limitTextLabel: UILabel = {
         let label = UILabel()
         label.text = "Ограничение 38 символов"
         label.font = .systemFont(ofSize: 17, weight: .regular)
@@ -75,21 +70,21 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
     
     private let addCategoryNameTextField = UITextField()
     
-    let tableViewRows = ["Категория", "Расписание"]
+    private let tableViewRows = ["Категория", "Расписание"]
     private let tableView = UITableView()
     
-    let emojiArray = ["🙂","😻","🌺","🐶","❤️","😱",
+    private let emojiArray = ["🙂","😻","🌺","🐶","❤️","😱",
                       "😇","😡","🥶","🤔","🙌","🍔",
                       "🥦","🏓","🥇","🎸","🏝️","😪",]
     
-    let emojiCollection: UICollectionView = {
+    private let emojiCollection: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         let emojiCollection = UICollectionView(frame: .zero, collectionViewLayout: layout)
         return emojiCollection
     }()
     
-    let colorArray: [UIColor] = [
+    private let colorArray: [UIColor] = [
         UIColor(named: "Color selection 1")!, UIColor(named: "Color selection 2")!,
         UIColor(named: "Color selection 3")!, UIColor(named: "Color selection 4")!,
         UIColor(named: "Color selection 5")!, UIColor(named: "Color selection 6")!,
@@ -101,7 +96,7 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         UIColor(named: "Color selection 17")!, UIColor(named: "Color selection 18")!,
     ]
     
-    let colorCollection: UICollectionView = {
+    private let colorCollection: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         let colorCollection = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -140,7 +135,7 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         // задаем заголовок для экрана
         self.title = "Новая привычка"
         view.backgroundColor = .white
-        
+                
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
         
@@ -159,6 +154,22 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         
         // добавляем наблюдатель для свойства hidden у лейбла
         limitTextLabel.addObserver(self, forKeyPath: "hidden", options: [.old, .new], context: nil)
+        
+        // тапгесчур необходим для закрытия клавиатуры по тапу на пустую область экрана
+        let tapGesture = UITapGestureRecognizer(target: self,
+                                                action: #selector(hideKeyBoard))
+        tapGesture.cancelsTouchesInView = false
+        self.view.addGestureRecognizer(tapGesture)
+    }
+    
+    // метод для наблюдателя
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == "hidden", let label = object as? UILabel {
+            tableViewTopConstraint?.constant = label.isHidden ? 20 : 60
+        }
+        UIView.animate(withDuration: 0.3) {
+            self.view.layoutIfNeeded()
+        }
     }
     
     // необходим чтобы избежать утечек памяти (при деинициализации контроллера)
@@ -166,7 +177,37 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         limitTextLabel.removeObserver(self, forKeyPath: "hidden")
     }
     
-    func setupScrollView() {
+    func finishCreatingHabitAndDismiss() {
+        dismiss(animated: false) {
+            self.habitCreateDelegate?.didFinishCreatingHabitAndDismiss()
+            print("Вызов делегата на чтобы закрыть привычкувью")
+        }
+    }
+    
+    // метод для обновления выбранной категории
+    func didSelectCategory(_ selectedCategory: String?) {
+        self.selectedCategoryStringForHabit = selectedCategory
+        tableView.reloadData()
+        updateCreateButtonState()
+    }
+    
+    // метод для активации кнопки "Создать" для привычки
+    func updateCreateButtonState() {
+        guard selectedCategory != nil ,
+              selectedDays != nil,
+              selectedEmoji != nil,
+              selectedColor != nil,
+              addCategoryNameTextField.text?.isEmpty == false
+                
+        else {
+            addButton.isEnabled = false
+            return
+        }
+        addButton.isEnabled = true
+        addButton.backgroundColor = .black
+    }
+    
+    private func setupScrollView() {
         NSLayoutConstraint.activate([
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -175,7 +216,7 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         ])
     }
     
-    func setupContentView() {
+    private func setupContentView() {
         NSLayoutConstraint.activate([
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
@@ -185,16 +226,7 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         ])
     }
     
-    //    func setupLabel() {
-    //        contentView.addSubview(label)
-    //
-    //        NSLayoutConstraint.activate([
-    //            label.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-    //            label.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 22),
-    //        ])
-    //    }
-    
-    func setuplimitTextLabel() {
+    private func setuplimitTextLabel() {
         contentView.addSubview(limitTextLabel)
         limitTextLabel.translatesAutoresizingMaskIntoConstraints = false
         
@@ -204,7 +236,7 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         ])
     }
     
-    func setupAddCategoryNameTextField(){
+    private func setupAddCategoryNameTextField(){
         addCategoryNameTextField.placeholder = "Введите название трека"
         addCategoryNameTextField.font = .systemFont(ofSize: 17, weight: .regular)
         addCategoryNameTextField.textColor = .black
@@ -229,7 +261,7 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
             addCategoryNameTextField.heightAnchor.constraint(equalToConstant: 75)])
     }
     
-    func setupTableView() {
+    private func setupTableView() {
         
         contentView.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -240,6 +272,7 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         
         tableView.dataSource = self
         tableView.delegate = self
+        tableView.keyboardDismissMode = .onDrag
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         
         tableViewTopConstraint = tableView.topAnchor.constraint(equalTo: addCategoryNameTextField.bottomAnchor, constant: limitTextLabel.isHidden ? 20 : 60)
@@ -255,7 +288,7 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         }
     }
     
-    func setupEmojiCollection() {
+    private func setupEmojiCollection() {
         
         contentView.addSubview(emojiCollection)
         emojiCollection.translatesAutoresizingMaskIntoConstraints = false
@@ -265,6 +298,7 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         emojiCollection.register(SupplementaryView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
         emojiCollection.dataSource = self
         emojiCollection.delegate = self
+        emojiCollection.keyboardDismissMode = .onDrag
         
         NSLayoutConstraint.activate([
             emojiCollection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
@@ -274,7 +308,7 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         ])
     }
     
-    func setupColorCollection() {
+    private func setupColorCollection() {
         
         contentView.addSubview(colorCollection)
         colorCollection.translatesAutoresizingMaskIntoConstraints = false
@@ -284,6 +318,7 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         colorCollection.register(SupplementaryView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
         colorCollection.dataSource = self
         colorCollection.delegate = self
+        colorCollection.keyboardDismissMode = .onDrag
         
         NSLayoutConstraint.activate([
             colorCollection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
@@ -293,7 +328,7 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         ])
     }
     
-    func setupButtons() {
+    private func setupButtons() {
         contentView.addSubview(cancelButton)
         contentView.addSubview(addButton)
         
@@ -313,29 +348,6 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
             addButton.widthAnchor.constraint(equalTo: cancelButton.widthAnchor),
             addButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -30)
         ])
-    }
-    
-    // метод для обновления выбранной категории
-    func didSelectCategory(_ selectedCategory: String?) {
-        self.selectedCategoryStringForHabit = selectedCategory
-        tableView.reloadData()
-        updateCreateButtonState()
-    }
-    
-    // метод для активации кнопки "Создать" для привычки
-    func updateCreateButtonState() {
-        guard selectedCategory != nil ,
-              selectedDays != nil,
-              selectedEmoji != nil,
-              selectedColor != nil,
-              addCategoryNameTextField.text?.isEmpty == false
-                
-        else {
-            addButton.isEnabled = false
-            return
-        }
-        addButton.isEnabled = true
-        addButton.backgroundColor = .black
     }
     
     // обработка нажатия TextField
@@ -381,23 +393,9 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         print("✅ Новая привычка c названием категории \(selectedCategoryString), названием привычки \(selectedHabitName), выбранным эмодзи \(selectedEmojiString), выбранным цветом \(selectedColorSting), и выбранными днями \(scheduleComponents) создана")
     }
     
-    func finishCreatingHabitAndDismiss() {
-        dismiss(animated: false) {
-            self.habitCreateDelegate?.didFinishCreatingHabitAndDismiss()
-            print("Вызов делегата на чтобы закрыть привычкувью")
-        }
+    @objc private func hideKeyBoard() {
+        self.view.endEditing(true)
     }
-    
-    // метод для наблюдателя
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if keyPath == "hidden", let label = object as? UILabel {
-            tableViewTopConstraint?.constant = label.isHidden ? 20 : 60
-        }
-        UIView.animate(withDuration: 0.3) {
-            self.view.layoutIfNeeded()
-        }
-    }
-    
 }
 
 // настраиваем textField
@@ -417,6 +415,12 @@ extension NewHabitViewController: UITextFieldDelegate {
         }
         
         return newText.count <= 38
+    }
+    
+    // метод для закрытия клавиатуры при нажатии на "return"
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
 }
 

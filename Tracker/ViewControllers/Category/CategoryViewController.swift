@@ -17,12 +17,11 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
     weak var delegate: CategoryViewControllerDelegate?
     var categoryToPass: ( (String) -> Void )?
     var categories: [TrackerCategory] = []
-    
-    var selectedIndexPath: IndexPath?
-    var selectedCategory: String?
-    
     var dataUpdated: ( () -> Void )?
     
+    private var selectedIndexPath: IndexPath?
+    private var selectedCategory: String?
+        
     private var isCheckmarkImageSelected: Bool = false
     
     private let labelHeader: UILabel = {
@@ -36,8 +35,9 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
     
     private let errorImage = UIImageView()
     private let labelText = UILabel()
+    private let categoryTableView = UITableView()
     
-    private var buttonAddCategory: UIButton = {
+    private let buttonAddCategory: UIButton = {
         let button = UIButton()
         button.setTitle("Добавить категорию", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
@@ -48,8 +48,6 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
         return button
     }()
     
-    let categoryTableView = UITableView()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -58,7 +56,35 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
         setupLabelHeader()
         setupScreen()
         setupAddCategoryButton()
+    }
+    
+    func passCategoryToCreatingTrackerVC(selectedCategory: String) {
         
+        let trackerCategory = TrackerCategory(header: selectedCategory, trackers: nil)
+        categories.append(trackerCategory)
+        categoryToPass?(trackerCategory.header)
+        setupCategoryTableView()
+        
+        if let navigationController = self.navigationController {
+            navigationController.popViewController(animated: true)
+        } else {
+            dismiss(animated: true ) { [weak self ] in
+                guard (self?.categories) != nil else { return }
+                self?.delegate?.didSelectCategory(selectedCategory)
+            }
+        }
+    }
+    
+    func didCreatedCategory(_ createdCategory: TrackerCategory) {
+        categories.append(createdCategory)
+        
+        let newIndexPath = IndexPath(row: categories.count - 1, section: 0)
+        categoryTableView.insertRows(at: [newIndexPath], with: .automatic)
+        
+        setupScreen()
+        delegate?.didSelectCategory(selectedCategory)
+        categoryTableView.reloadData()
+        dataUpdated?()
     }
     
     private func setupCategoryTableView() {
@@ -111,7 +137,6 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
         labelText.textColor = .black
         labelText.numberOfLines = 0
         labelText.lineBreakMode = .byWordWrapping
-        //        labelText.sizeToFit()
         labelText.textAlignment = .center
         
         view.addSubview(labelText)
@@ -145,23 +170,6 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
         }
     }
     
-    func passCategoryToCreatingTrackerVC(selectedCategory: String) {
-        
-        let trackerCategory = TrackerCategory(header: selectedCategory, trackers: nil)
-        categories.append(trackerCategory)
-        categoryToPass?(trackerCategory.header)
-        setupCategoryTableView()
-        
-        if let navigationController = self.navigationController {
-            navigationController.popViewController(animated: true)
-        } else {
-            dismiss(animated: true ) { [weak self ] in
-                guard (self?.categories) != nil else { return }
-                self?.delegate?.didSelectCategory(selectedCategory)
-            }
-        }
-    }
-    
     @objc func addCategoryButton() {
         
         if isCheckmarkImageSelected == true {
@@ -176,20 +184,7 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
             present(navigationViewController, animated: true)
             print("Button Добавить категорию tapped")
             print(#fileID, #function, #line)
-            
         }
-    }
-    
-    func didCreatedCategory(_ createdCategory: TrackerCategory) {
-        categories.append(createdCategory)
-        
-        let newIndexPath = IndexPath(row: categories.count - 1, section: 0)
-        categoryTableView.insertRows(at: [newIndexPath], with: .automatic)
-        
-        setupScreen()
-        delegate?.didSelectCategory(selectedCategory)
-        categoryTableView.reloadData()
-        dataUpdated?()
     }
 }
 

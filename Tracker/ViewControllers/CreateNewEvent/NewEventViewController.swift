@@ -14,29 +14,23 @@ protocol NewEventCreateViewControllerDelegate: AnyObject {
 
 final class NewEventViewController: UIViewController, CategoryViewControllerDelegate {
     
+    let datePicker = UIDatePicker()
+    
+    var currentDate: Date = Date()
+    var onDismiss: (() -> Void)?
+    
     weak var addCategoryDelegate: CategoryViewControllerDelegate?
     weak var eventCreateDelegate: NewEventCreateViewControllerDelegate?
     
-    var selectedHabitName: [Tracker]? = []
-    
-    var selectedDays: String?
-    
-    var selectedCategory: String?
-    
-    var selectedEmoji: String?
-    
-    var selectedColor: UIColor?
-    
-    var selectedCategoryStringForHabit: String?
-    
-    let datePicker = UIDatePicker()
-    var currentDate: Date = Date()
-    
-    var onDismiss: (() -> Void)?
-    
+    private var selectedHabitName: [Tracker]? = []
+    private var selectedDays: String?
+    private var selectedCategory: String?
+    private var selectedEmoji: String?
+    private var selectedColor: UIColor?
+    private var selectedCategoryStringForHabit: String?
     private var tableViewTopConstraint: NSLayoutConstraint?
     
-    let limitTextLabel: UILabel = {
+    private let limitTextLabel: UILabel = {
         let label = UILabel()
         label.text = "Ограничение 38 символов"
         label.font = .systemFont(ofSize: 17, weight: .regular)
@@ -78,21 +72,21 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
     
     private let addCategoryNameTextField = UITextField()
     
-    let tableViewRows = "Категория"
+    private let tableViewRows = "Категория"
     private let tableView = UITableView()
     
-    let emojiArray = ["🙂","😻","🌺","🐶","❤️","😱",
+    private let emojiArray = ["🙂","😻","🌺","🐶","❤️","😱",
                       "😇","😡","🥶","🤔","🙌","🍔",
                       "🥦","🏓","🥇","🎸","🏝️","😪",]
     
-    let emojiCollection: UICollectionView = {
+    private let emojiCollection: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         let emojiCollection = UICollectionView(frame: .zero, collectionViewLayout: layout)
         return emojiCollection
     }()
     
-    let colorArray: [UIColor] = [
+    private let colorArray: [UIColor] = [
         UIColor(named: "Color selection 1")!, UIColor(named: "Color selection 2")!,
         UIColor(named: "Color selection 3")!, UIColor(named: "Color selection 4")!,
         UIColor(named: "Color selection 5")!, UIColor(named: "Color selection 6")!,
@@ -104,7 +98,7 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
         UIColor(named: "Color selection 17")!, UIColor(named: "Color selection 18")!,
     ]
     
-    let colorCollection: UICollectionView = {
+    private let colorCollection: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         let colorCollection = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -162,14 +156,59 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
         
         // добавляем наблюдатель для свойства hidden у лейбла
         limitTextLabel.addObserver(self, forKeyPath: "hidden", options: [.old, .new], context: nil)
+        
+        let tapGuesture = UITapGestureRecognizer(target: self,
+                                                 action: #selector(hideKeyboard))
+        tapGuesture.cancelsTouchesInView = false
+        self.view.addGestureRecognizer(tapGuesture)
     }
     
+    // метод для наблюдателя
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == "hidden", let label = object as? UILabel {
+            tableViewTopConstraint?.constant = label.isHidden ? 20 : 60
+        }
+        UIView.animate(withDuration: 0.3) {
+            self.view.layoutIfNeeded()
+        }
+    }
+
     // необходим чтобы избежать утечек памяти (при деинициализации контроллера)
     deinit {
         limitTextLabel.removeObserver(self, forKeyPath: "hidden")
     }
     
-    func setupScrollView() {
+    // метод для обновления выбранной категории
+    func didSelectCategory(_ selectedCategory: String?) {
+        self.selectedCategoryStringForHabit = selectedCategory
+        tableView.reloadData()
+        updateCreateButtonState()
+    }
+    
+    // метод для активации кнопки "Создать" для привычки
+    func updateCreateButtonState() {
+        guard selectedCategory != nil ,
+              selectedEmoji != nil,
+              selectedColor != nil,
+              addCategoryNameTextField.text?.isEmpty == false
+                
+        else {
+            addButton.isEnabled = false
+            return
+        }
+        addButton.isEnabled = true
+        addButton.backgroundColor = .black
+    }
+    
+    func finishCreatingEventAndDismiss() {
+        dismiss(animated: false) {
+            print("Перед вызовом делегата didFinishCreatingEventAndDismiss: \(self.eventCreateDelegate != nil)")
+            self.eventCreateDelegate?.didFinishCreatingEventAndDismiss()
+            print("Вызов делегата на чтобы закрыть событие")
+        }
+    }
+    
+    private func setupScrollView() {
         NSLayoutConstraint.activate([
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -178,7 +217,7 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
         ])
     }
     
-    func setupContentView() {
+    private func setupContentView() {
         NSLayoutConstraint.activate([
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
@@ -188,7 +227,7 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
         ])
     }
     
-    func setuplimitTextLabel() {
+    private func setuplimitTextLabel() {
         contentView.addSubview(limitTextLabel)
         limitTextLabel.translatesAutoresizingMaskIntoConstraints = false
         
@@ -198,7 +237,7 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
         ])
     }
     
-    func setupAddCategoryNameTextField(){
+    private func setupAddCategoryNameTextField(){
         addCategoryNameTextField.placeholder = "Введите название трека"
         addCategoryNameTextField.font = .systemFont(ofSize: 17, weight: .regular)
         addCategoryNameTextField.textColor = .black
@@ -223,7 +262,7 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
             addCategoryNameTextField.heightAnchor.constraint(equalToConstant: 75)])
     }
     
-    func setupTableView() {
+    private func setupTableView() {
         
         contentView.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -249,7 +288,7 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
         }
     }
     
-    func setupEmojiCollection() {
+    private func setupEmojiCollection() {
         
         contentView.addSubview(emojiCollection)
         emojiCollection.translatesAutoresizingMaskIntoConstraints = false
@@ -268,7 +307,7 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
         ])
     }
     
-    func setupColorCollection() {
+    private func setupColorCollection() {
         
         contentView.addSubview(colorCollection)
         colorCollection.translatesAutoresizingMaskIntoConstraints = false
@@ -287,7 +326,7 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
         ])
     }
     
-    func setupButtons() {
+    private func setupButtons() {
         contentView.addSubview(cancelButton)
         contentView.addSubview(addButton)
         
@@ -309,35 +348,12 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
         ])
     }
     
-    // метод для обновления выбранной категории
-    func didSelectCategory(_ selectedCategory: String?) {
-        self.selectedCategoryStringForHabit = selectedCategory
-        tableView.reloadData()
-        updateCreateButtonState()
-    }
-    
-    func getCurrentDayInRussian() -> String? {
+    private func getCurrentDayInRussian() -> String? {
         let daysOfWeek = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"]
         let currentDate = Date()
         let calendar = Calendar.current
         let weekDayIndex = calendar.component(.weekday, from: currentDate) - 1
         return daysOfWeek[weekDayIndex]
-    }
-    
-    // метод для активации кнопки "Создать" для привычки
-    func updateCreateButtonState() {
-        guard selectedCategory != nil ,
-              //              selectedDays != nil,
-              selectedEmoji != nil,
-              selectedColor != nil,
-              addCategoryNameTextField.text?.isEmpty == false
-                
-        else {
-            addButton.isEnabled = false
-            return
-        }
-        addButton.isEnabled = true
-        addButton.backgroundColor = .black
     }
     
     // обработка нажатия TextField
@@ -389,24 +405,9 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
         print("✅ Новое событие c названием категории \(selectedCategoryString), названием привычки \(selectedHabitName), выбранным эмодзи \(selectedEmojiString), выбранным цветом \(selectedColorSting), и выбранными днями \(selectedDays) создана")
     }
     
-    func finishCreatingEventAndDismiss() {
-        dismiss(animated: false) {
-            print("Перед вызовом делегата didFinishCreatingEventAndDismiss: \(self.eventCreateDelegate != nil)")
-            self.eventCreateDelegate?.didFinishCreatingEventAndDismiss()
-            print("Вызов делегата на чтобы закрыть событие")
-        }
+    @objc private func hideKeyboard() {
+        self.view.endEditing(true)
     }
-    
-    // метод для наблюдателя
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if keyPath == "hidden", let label = object as? UILabel {
-            tableViewTopConstraint?.constant = label.isHidden ? 20 : 60
-        }
-        UIView.animate(withDuration: 0.3) {
-            self.view.layoutIfNeeded()
-        }
-    }
-    
 }
 
 // настраиваем textField
@@ -426,6 +427,12 @@ extension NewEventViewController: UITextFieldDelegate {
         }
         
         return newText.count <= 38
+    }
+    
+    // метод для закрытия клавиатуры при нажатии на return
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
 }
 

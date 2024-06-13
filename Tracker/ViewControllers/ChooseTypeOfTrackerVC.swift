@@ -24,7 +24,7 @@ final class ChooseTypeOfTrackerVC: UIViewController, NewHabitCreateViewControlle
         return label
     }()
     
-    private var addNewHabitButton: UIButton = {
+    private let addNewHabitButton: UIButton = {
         let button = UIButton()
         button.setTitle("Привычка", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
@@ -45,7 +45,6 @@ final class ChooseTypeOfTrackerVC: UIViewController, NewHabitCreateViewControlle
         button.layer.masksToBounds = true
         return button
     }()
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -82,24 +81,6 @@ final class ChooseTypeOfTrackerVC: UIViewController, NewHabitCreateViewControlle
         
     }
     
-    @objc func setupNewHabitButton() {
-        let addNewHabitVC = NewHabitViewController()
-        addNewHabitVC.habitCreateDelegate = self
-        let addNavigationController = UINavigationController(rootViewController: addNewHabitVC)
-        addNavigationController.modalPresentationStyle = .pageSheet
-        present(addNavigationController, animated: true)
-        print("Habit button tapped")
-    }
-    
-    @objc func setupNewEventButton() {
-        let addNewEventVC = NewEventViewController()
-        addNewEventVC.eventCreateDelegate = self
-        let addNavigationController = UINavigationController(rootViewController: addNewEventVC)
-        addNavigationController.modalPresentationStyle = .pageSheet
-        present(addNavigationController, animated: true)
-        print("Irregular Event button tapped")
-    }
-    
     func didCreateHabit(with trackerCategoryString: TrackerCategory) {
         self.habitCreateDelegate?.didCreateHabit(with: trackerCategoryString)
     }
@@ -131,5 +112,23 @@ final class ChooseTypeOfTrackerVC: UIViewController, NewHabitCreateViewControlle
             self.eventCreateDelegate?.didFinishCreatingEventAndDismiss()
         }
         print("Вызов делегата на выборпривычкалилисобытие для события")
+    }
+    
+    @objc func setupNewHabitButton() {
+        let addNewHabitVC = NewHabitViewController()
+        addNewHabitVC.habitCreateDelegate = self
+        let addNavigationController = UINavigationController(rootViewController: addNewHabitVC)
+        addNavigationController.modalPresentationStyle = .pageSheet
+        present(addNavigationController, animated: true)
+        print("Habit button tapped")
+    }
+    
+    @objc func setupNewEventButton() {
+        let addNewEventVC = NewEventViewController()
+        addNewEventVC.eventCreateDelegate = self
+        let addNavigationController = UINavigationController(rootViewController: addNewEventVC)
+        addNavigationController.modalPresentationStyle = .pageSheet
+        present(addNavigationController, animated: true)
+        print("Irregular Event button tapped")
     }
 }

@@ -39,7 +39,7 @@ final class ScheduleViewController: UIViewController {
     }()
     
     // массив с названиями дней недели для таблицы
-    let tableViewRows = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
+    private let tableViewRows = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
     
     // таблица для отображения дней недели
     private let tableView = UITableView()
@@ -73,7 +73,33 @@ final class ScheduleViewController: UIViewController {
         setupReadyButton()
     }
     
-    func setupLabelHeader() {
+    // метод для добавления или удаления индекса в массиве хранения индексов дней недели
+    func appendOrRemoveArray(sender: Bool, indexPath: IndexPath) {
+        
+        if sender == true {
+            self.arrayOfIndexes.append(indexPath.row)
+        } else {
+            self.arrayOfIndexes.removeAll(where: { $0 == indexPath.row })
+        }
+    }
+    
+    // передаем выбранные дни недели в ячейку в NewHabitVC
+    func passScheduleToCreatingTrackerVC() {
+        var result = String()
+        
+        if arrayOfIndexes.count == 7 {
+            result = "Каждый день"
+        } else {
+            let daysOfWeek = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
+            let arrayOfString = arrayOfIndexes.map { daysOfWeek[$0] }
+            result = arrayOfString.joined(separator: ", ")
+        }
+        
+        scheduleToPass?(result)
+        navigationController?.popViewController(animated: true)
+    }
+    
+    private func setupLabelHeader() {
         contentView.addSubview(labelHeader)
         labelHeader.translatesAutoresizingMaskIntoConstraints = false
         
@@ -83,7 +109,7 @@ final class ScheduleViewController: UIViewController {
         ])
     }
     
-    func setupScrollView() {
+    private func setupScrollView() {
         NSLayoutConstraint.activate([
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -93,7 +119,7 @@ final class ScheduleViewController: UIViewController {
         ])
     }
     
-    func setupContentView() {
+    private func setupContentView() {
         NSLayoutConstraint.activate([
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
@@ -104,7 +130,7 @@ final class ScheduleViewController: UIViewController {
         ])
     }
     
-    func setupReadyButton(){
+    private func setupReadyButton(){
         
         view.addSubview(readyButton)
         readyButton.translatesAutoresizingMaskIntoConstraints = false
@@ -118,7 +144,7 @@ final class ScheduleViewController: UIViewController {
         ])
     }
     
-    func setupTableView() {
+    private func setupTableView() {
         
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -153,32 +179,6 @@ final class ScheduleViewController: UIViewController {
         let isOn = sender.isOn
         appendOrRemoveArray(sender: isOn, indexPath: indexPath)
         print("Switch button changed")
-    }
-    
-    // метод для добавления или удаления индекса в массиве хранения индексов дней недели
-    func appendOrRemoveArray(sender: Bool, indexPath: IndexPath) {
-        
-        if sender == true {
-            self.arrayOfIndexes.append(indexPath.row)
-        } else {
-            self.arrayOfIndexes.removeAll(where: { $0 == indexPath.row })
-        }
-    }
-    
-    // передаем выбранные дни недели в ячейку в NewHabitVC
-    func passScheduleToCreatingTrackerVC() {
-        var result = String()
-        
-        if arrayOfIndexes.count == 7 {
-            result = "Каждый день"
-        } else {
-            let daysOfWeek = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
-            let arrayOfString = arrayOfIndexes.map { daysOfWeek[$0] }
-            result = arrayOfString.joined(separator: ", ")
-        }
-        
-        scheduleToPass?(result)
-        navigationController?.popViewController(animated: true)
     }
 }
 

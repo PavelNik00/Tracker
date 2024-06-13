@@ -23,7 +23,7 @@ class StatisticViewController: UIViewController {
         setupLabelQuestion()
     }
     
-    func setupStatisticTitle() {
+    private func setupStatisticTitle() {
         labelStatisticTitle.translatesAutoresizingMaskIntoConstraints = false
         labelStatisticTitle.font = .boldSystemFont(ofSize: 34)
         labelStatisticTitle.text = "Статистика"
@@ -35,7 +35,7 @@ class StatisticViewController: UIViewController {
         labelStatisticTitle.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
     }
     
-    func setupNoStatisticImage() {
+    private func setupNoStatisticImage() {
         noStatisticImage.image = UIImage(named: "icon_statistic_error")
         noStatisticImage.translatesAutoresizingMaskIntoConstraints = false
         noStatisticImage.heightAnchor.constraint(equalToConstant: 80).isActive = true
@@ -47,7 +47,7 @@ class StatisticViewController: UIViewController {
         noStatisticImage.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
     }
     
-    func setupLabelQuestion() {
+    private func setupLabelQuestion() {
         labelQuestion.translatesAutoresizingMaskIntoConstraints = false
         labelQuestion.font = .systemFont(ofSize: 12)
         labelQuestion.text = "Анализировать пока нечего"

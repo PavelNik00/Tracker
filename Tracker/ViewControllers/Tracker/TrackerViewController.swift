@@ -5,43 +5,36 @@
 //  Created by Pavel Nikipelov on 03.04.2024.
 //
 
-///
-/// Ветка для просмотра проекта с комментариями
-///
-///
-
 import UIKit
 
 final class TrackerViewController: UIViewController, NewHabitCreateViewControllerDelegate, NewEventCreateViewControllerDelegate {
     
+    let newHabitViewController = NewHabitViewController()
+    let newEventViewController = NewEventViewController()
+    
     // список категорий и вложенных в них трекеров
     var categories: [TrackerCategory] = []
     var newHabit: [Tracker]
+    var currentDate: Date = Date()
     
     // трекеры, которые были выполнены в выбранную дату хранятся здесь
     var completedTrackers: [TrackerRecord] = []
     
-    var trackerID: UUID?
+    private var trackerID: UUID?
+    private var selectedHabitNameString: String?
+    private var selectedCategoryName: String?
+    private var selectedDaysString: String?
+    private var selectedColorName: UIColor?
+    private var selectedEmojiString: String?
     
-    var selectedHabitNameString: String?
-    var selectedCategoryName: String?
-    var selectedDaysString: String?
-    var selectedColorName: UIColor?
-    var selectedEmojiString: String?
-    
-    let datePicker = UIDatePicker()
-    var currentDate: Date = Date()
-        
-    let errorImage = UIImageView()
-    let labelQuestion = UILabel()
-    let labelTrackerTitle = UILabel()
-    let searchBar = UISearchBar()
-    
-    let newHabitViewController = NewHabitViewController()
-    let newEventViewController = NewEventViewController()
+    private let datePicker = UIDatePicker()
+    private let errorImage = UIImageView()
+    private let labelQuestion = UILabel()
+    private let labelTrackerTitle = UILabel()
+    private let searchBar = UISearchBar()
     
     // массив для преобразования полученной даты из rus в eng
-    let dayOfWeekMapping: [String: String] = [
+    private let dayOfWeekMapping: [String: String] = [
         "Пн" : "Monday",
         "Вт": "Tuesday",
         "Ср": "Wednesday",
@@ -51,7 +44,7 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         "Вс": "Sunday"
     ]
     
-    let trackerCollectionView: UICollectionView = {
+    private let trackerCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -87,61 +80,6 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         setupNavigationBar()
     }
     
-    private func updateView() {
-        if !isHabitExistsForSelectedDate() {
-            setupErrorImage()
-            setuplabelQuestion()
-            print("Загрузка картинки и рыбы-текста")
-        } else {
-            removeErrorImageAndLabelQuestion()
-            setupTrackerCollectionView()
-            //            trackerCollectionView.reloadData()
-            print("Загрузка коллекции")
-        }
-        trackerCollectionView.reloadData()
-    }
-    
-    private func removeErrorImageAndLabelQuestion() {
-        errorImage.removeFromSuperview()
-        labelQuestion.removeFromSuperview()
-    }
-    
-    private func setupErrorImage() {
-        errorImage.image = UIImage(named: "icon_error")
-        errorImage.translatesAutoresizingMaskIntoConstraints = false
-        errorImage.heightAnchor.constraint(equalToConstant: 80).isActive = true
-        errorImage.widthAnchor.constraint(equalToConstant: 80).isActive = true
-        errorImage.clipsToBounds = true
-        
-        view.addSubview(errorImage)
-        errorImage.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        errorImage.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-    }
-    
-    private func setuplabelQuestion() {
-        labelQuestion.translatesAutoresizingMaskIntoConstraints = false
-        labelQuestion.text = "Что будем отслеживать?"
-        labelQuestion.font = .systemFont(ofSize: 12)
-        labelQuestion.sizeToFit()
-        labelQuestion.textAlignment = .center
-        
-        view.addSubview(labelQuestion)
-        labelQuestion.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        labelQuestion.topAnchor.constraint(equalTo: errorImage.bottomAnchor, constant: 8).isActive = true
-    }
-    
-    private func setuplabelTrackerTitle() {
-        labelTrackerTitle.translatesAutoresizingMaskIntoConstraints = false
-        labelTrackerTitle.text = "Трекеры"
-        labelTrackerTitle.font = .boldSystemFont(ofSize: 34)
-        labelTrackerTitle.sizeToFit()
-        labelTrackerTitle.textAlignment = .left
-        
-        view.addSubview(labelTrackerTitle)
-        labelTrackerTitle.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16).isActive = true
-        labelTrackerTitle.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
-    }
-    
     func setupNavigationBar() {
         let image = UIImage(named: "icon_plus")
         
@@ -166,88 +104,6 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         datePicker.widthAnchor.constraint(equalToConstant: 100).isActive = true
         datePicker.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .valueChanged)
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: datePicker)
-    }
-    
-    private func setupSearchBar() {
-        searchBar.translatesAutoresizingMaskIntoConstraints = false
-        searchBar.placeholder = "Поиск"
-        searchBar.barTintColor = UIColor(red: 118, green: 118, blue: 128, alpha: 0.12)
-        
-        view.addSubview(searchBar)
-        searchBar.topAnchor.constraint(equalTo: labelTrackerTitle.bottomAnchor, constant: 8).isActive = true
-        searchBar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 8).isActive = true
-        searchBar.heightAnchor.constraint(equalToConstant: 36).isActive = true
-        searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8).isActive = true
-    }
-    
-    func setupTrackerCollectionView() {
-        view.addSubview(trackerCollectionView)
-        trackerCollectionView.translatesAutoresizingMaskIntoConstraints = false
-        
-        let layout = trackerCollectionView.collectionViewLayout as? UICollectionViewFlowLayout
-        layout?.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-        layout?.headerReferenceSize = CGSize(width: trackerCollectionView.frame.width, height: 50)
-        
-        trackerCollectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        
-        trackerCollectionView.register(TrackerCollectionViewCell.self, forCellWithReuseIdentifier: "TrackerCell")
-        trackerCollectionView.register(TrackerCollectionSupplementaryView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "Header")
-        
-        // trackerCollectionView.backgroundColor = .lightGrey
-        trackerCollectionView.delegate = self
-        trackerCollectionView.dataSource = self
-        
-        NSLayoutConstraint.activate([
-            trackerCollectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 10),
-            trackerCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            trackerCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            trackerCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-        ])
-    }
-    
-    @objc func datePickerValueChanged(_ sender: UIDatePicker) {
-        let selectedDateNew = sender.date
-        currentDate = selectedDateNew
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd.MM.yy"
-        let formattedDate = dateFormatter.string(from: currentDate)
-        
-        if isHabitExistsForSelectedDate() {
-            removeErrorImageAndLabelQuestion()
-        }
-        
-        updateView()
-        print("Выбранная дата: \(formattedDate)")
-    }
-    
-    // метод для обновления ячейки, есть ли привычка для выбранного дня или нет. Используется для обновления UI - отображения заглушки/коллекции
-    private func isHabitExistsForSelectedDate() -> Bool {
-        for category in categories {
-            if let trackers = category.trackers {
-                for tracker in trackers {
-                    let scheduleComponents = tracker.schedule
-                    let dayOfWeek = Calendar.current.component(.weekday, from: currentDate)
-                    let weekDaySymbols = Calendar.current.weekdaySymbols
-                    let selectedDayName = weekDaySymbols[dayOfWeek - 1]
-                    
-                    let englishScheduleComponents = scheduleComponents.compactMap { dayOfWeekMapping[$0]}
-                    if englishScheduleComponents.contains(selectedDayName) {
-                        return true
-                    }
-                }
-            }
-        }
-        return false
-    }
-    
-    @objc func addButtonTapped() {
-        let addNewVC = ChooseTypeOfTrackerVC()
-        addNewVC.habitCreateDelegate = self
-        addNewVC.eventCreateDelegate = self
-        let addNavigationController = UINavigationController(rootViewController: addNewVC)
-        addNavigationController.modalPresentationStyle = .pageSheet
-        present(addNavigationController, animated: true)
-        print("Нажата клавиша создания привычки или события")
     }
     
     func didFinishCreatingHabitAndDismiss() {
@@ -353,6 +209,143 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
             print("Ошибка: не удалось получить дату из расписания")
         }
     }
+    
+    private func updateView() {
+        if !isHabitExistsForSelectedDate() {
+            setupErrorImage()
+            setuplabelQuestion()
+            print("Загрузка картинки и рыбы-текста")
+        } else {
+            removeErrorImageAndLabelQuestion()
+            setupTrackerCollectionView()
+            //            trackerCollectionView.reloadData()
+            print("Загрузка коллекции")
+        }
+        trackerCollectionView.reloadData()
+    }
+    
+    private func removeErrorImageAndLabelQuestion() {
+        errorImage.removeFromSuperview()
+        labelQuestion.removeFromSuperview()
+    }
+    
+    private func setupErrorImage() {
+        errorImage.image = UIImage(named: "icon_error")
+        errorImage.translatesAutoresizingMaskIntoConstraints = false
+        errorImage.heightAnchor.constraint(equalToConstant: 80).isActive = true
+        errorImage.widthAnchor.constraint(equalToConstant: 80).isActive = true
+        errorImage.clipsToBounds = true
+        
+        view.addSubview(errorImage)
+        errorImage.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        errorImage.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+    }
+    
+    private func setuplabelQuestion() {
+        labelQuestion.translatesAutoresizingMaskIntoConstraints = false
+        labelQuestion.text = "Что будем отслеживать?"
+        labelQuestion.font = .systemFont(ofSize: 12)
+        labelQuestion.sizeToFit()
+        labelQuestion.textAlignment = .center
+        
+        view.addSubview(labelQuestion)
+        labelQuestion.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        labelQuestion.topAnchor.constraint(equalTo: errorImage.bottomAnchor, constant: 8).isActive = true
+    }
+    
+    private func setuplabelTrackerTitle() {
+        labelTrackerTitle.translatesAutoresizingMaskIntoConstraints = false
+        labelTrackerTitle.text = "Трекеры"
+        labelTrackerTitle.font = .boldSystemFont(ofSize: 34)
+        labelTrackerTitle.sizeToFit()
+        labelTrackerTitle.textAlignment = .left
+        
+        view.addSubview(labelTrackerTitle)
+        labelTrackerTitle.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16).isActive = true
+        labelTrackerTitle.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
+    }
+    
+    private func setupSearchBar() {
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        searchBar.placeholder = "Поиск"
+        searchBar.barTintColor = UIColor(red: 118, green: 118, blue: 128, alpha: 0.12)
+
+        view.addSubview(searchBar)
+        searchBar.topAnchor.constraint(equalTo: labelTrackerTitle.bottomAnchor, constant: 8).isActive = true
+        searchBar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 8).isActive = true
+        searchBar.heightAnchor.constraint(equalToConstant: 36).isActive = true
+        searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8).isActive = true
+    }
+    
+    private func setupTrackerCollectionView() {
+        view.addSubview(trackerCollectionView)
+        trackerCollectionView.translatesAutoresizingMaskIntoConstraints = false
+        
+        let layout = trackerCollectionView.collectionViewLayout as? UICollectionViewFlowLayout
+        layout?.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        layout?.headerReferenceSize = CGSize(width: trackerCollectionView.frame.width, height: 50)
+        
+        trackerCollectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        
+        trackerCollectionView.register(TrackerCollectionViewCell.self, forCellWithReuseIdentifier: "TrackerCell")
+        trackerCollectionView.register(TrackerCollectionSupplementaryView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "Header")
+        
+        // trackerCollectionView.backgroundColor = .lightGrey
+        trackerCollectionView.delegate = self
+        trackerCollectionView.dataSource = self
+        
+        NSLayoutConstraint.activate([
+            trackerCollectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 10),
+            trackerCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            trackerCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            trackerCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ])
+    }
+    
+    // метод для обновления ячейки, есть ли привычка для выбранного дня или нет. Используется для обновления UI - отображения заглушки/коллекции
+    private func isHabitExistsForSelectedDate() -> Bool {
+        for category in categories {
+            if let trackers = category.trackers {
+                for tracker in trackers {
+                    let scheduleComponents = tracker.schedule
+                    let dayOfWeek = Calendar.current.component(.weekday, from: currentDate)
+                    let weekDaySymbols = Calendar.current.weekdaySymbols
+                    let selectedDayName = weekDaySymbols[dayOfWeek - 1]
+                    
+                    let englishScheduleComponents = scheduleComponents.compactMap { dayOfWeekMapping[$0]}
+                    if englishScheduleComponents.contains(selectedDayName) {
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
+    
+    @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
+        let selectedDateNew = sender.date
+        currentDate = selectedDateNew
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd.MM.yy"
+        let formattedDate = dateFormatter.string(from: currentDate)
+        
+        if isHabitExistsForSelectedDate() {
+            removeErrorImageAndLabelQuestion()
+        }
+        
+        updateView()
+        print("Выбранная дата: \(formattedDate)")
+    }
+    
+    @objc func addButtonTapped() {
+        let addNewVC = ChooseTypeOfTrackerVC()
+        addNewVC.habitCreateDelegate = self
+        addNewVC.eventCreateDelegate = self
+        let addNavigationController = UINavigationController(rootViewController: addNewVC)
+        addNavigationController.modalPresentationStyle = .pageSheet
+        present(addNavigationController, animated: true)
+        print("Нажата клавиша создания привычки или события")
+    }
 }
 
 // настройка коллекции
@@ -424,24 +417,6 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
         return cell
     }
     
-    func getCompletedDaysCount(for tracker: Tracker) -> Int {
-        return completedTrackers.filter { $0.id == tracker.id }.count
-    }
-    
-    // метод для вычисления завершен ли трекер сегодня или нет
-    private func isTrackerCompletedToday(id: UUID, at indexPath: IndexPath) -> Bool {
-        completedTrackers.contains { trackerRecord in
-            isSameTrackerRecord(trackerRecord: trackerRecord, id: id)
-        }
-    }
-    
-    private func isSameTrackerRecord(trackerRecord: TrackerRecord, id: UUID) -> Bool {
-        // проверка по дню, не учитывая время
-        let isSameDay = Calendar.current.isDate(trackerRecord.date, inSameDayAs: currentDate)
-        print("выполнена проверка на соответсвте id и даты")
-        return trackerRecord.id == id && isSameDay
-    }
-    
     // настраиваем саплиментаривью(название категории)
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         
@@ -507,6 +482,24 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
         } else {
             return CGSize(width: collectionView.bounds.width, height: 0)
         }
+    }
+    
+    private func getCompletedDaysCount(for tracker: Tracker) -> Int {
+        return completedTrackers.filter { $0.id == tracker.id }.count
+    }
+    
+    // метод для вычисления завершен ли трекер сегодня или нет
+    private func isTrackerCompletedToday(id: UUID, at indexPath: IndexPath) -> Bool {
+        completedTrackers.contains { trackerRecord in
+            isSameTrackerRecord(trackerRecord: trackerRecord, id: id)
+        }
+    }
+    
+    private func isSameTrackerRecord(trackerRecord: TrackerRecord, id: UUID) -> Bool {
+        // проверка по дню, не учитывая время
+        let isSameDay = Calendar.current.isDate(trackerRecord.date, inSameDayAs: currentDate)
+        print("выполнена проверка на соответсвте id и даты")
+        return trackerRecord.id == id && isSameDay
     }
 }
 

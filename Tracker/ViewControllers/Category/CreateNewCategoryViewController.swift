@@ -17,11 +17,6 @@ final class CreateNewCategoryViewController: UIViewController, UITextFieldDelega
     weak var delegate: CreateNewCategoryViewControllerDelegate?
     var onDismiss: (() -> Void)?
     
-    convenience init(delegate: CreateNewCategoryViewControllerDelegate) {
-        self.init()
-        self.delegate = delegate
-    }
-    
     private var category: TrackerCategory?
     private var categories: [TrackerCategory] = []
     private var enteredText: String = ""
@@ -62,6 +57,11 @@ final class CreateNewCategoryViewController: UIViewController, UITextFieldDelega
         return button
     }()
     
+    convenience init(delegate: CreateNewCategoryViewControllerDelegate) {
+        self.init()
+        self.delegate = delegate
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -72,6 +72,12 @@ final class CreateNewCategoryViewController: UIViewController, UITextFieldDelega
         setupLabelHeader()
         setupTextField()
         setupReadyButton()
+        
+        // метод для закртия клавиатуры по тапу на экран
+        let tapGuesture = UITapGestureRecognizer(target: self,
+                                                 action: #selector(hideKeyboard))
+        tapGuesture.cancelsTouchesInView = false
+        self.view.addGestureRecognizer(tapGuesture)
     }
     
     func setupLabelHeader() {
@@ -110,10 +116,10 @@ final class CreateNewCategoryViewController: UIViewController, UITextFieldDelega
         ])
     }
     
-    @objc func textFieldEditing(_ textField: UITextField) {
-        if let enteredText = textField.text {
-            !enteredText.isEmpty ? readyButtonIsActive() : readyButtonIsNotActive()
-        }
+    // метод для закрытия клавиатуры по нажатию на return
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
     
     private func readyButtonIsActive() {
@@ -124,6 +130,12 @@ final class CreateNewCategoryViewController: UIViewController, UITextFieldDelega
     private func readyButtonIsNotActive() {
         readyButton.isEnabled = false
         readyButton.backgroundColor = UIColor(named: "Grey")
+    }
+    
+    @objc func textFieldEditing(_ textField: UITextField) {
+        if let enteredText = textField.text {
+            !enteredText.isEmpty ? readyButtonIsActive() : readyButtonIsNotActive()
+        }
     }
     
     // обрабатываем нажатие кнопки Готово
@@ -139,5 +151,9 @@ final class CreateNewCategoryViewController: UIViewController, UITextFieldDelega
             self.onDismiss?()
         }
         print(" ✅ Новая категория \(newCategoryName) создана")
+    }
+    
+    @objc private func hideKeyboard() {
+        self.view.endEditing(true)
     }
 }
