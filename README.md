@@ -1,5 +1,8 @@
 # ТЗ мобильного приложения для трекинга привычек
 
+![Tracker_view](https://github.com/PavelNik00/Tracker/assets/143431196/5f6f8d7a-a6cb-4959-8c6b-226036c2dfcc)
+
+
 # Ссылки
 
 [Дизайн Figma](https://www.figma.com/file/owAO4CAPTJdpM1BZU5JHv7/Tracker-(YP)?t=SZDLmkWeOPX4y6mp-0)
