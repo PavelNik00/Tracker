@@ -27,6 +27,7 @@
 		E9D3121E2BBDF07C00F8C0E5 /* LaunchScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D3121D2BBDF07C00F8C0E5 /* LaunchScreenViewController.swift */; };
 		E9D312202BC4834300F8C0E5 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D3121F2BC4834300F8C0E5 /* TabBarController.swift */; };
 		E9D312222BC4846A00F8C0E5 /* StatisticViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D312212BC4846A00F8C0E5 /* StatisticViewController.swift */; };
+		E9DB9CE82C245861005409B3 /* TrackerDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = E9DB9CE62C245861005409B3 /* TrackerDataModel.xcdatamodeld */; };
 		E9E7A5DC2C0244E900B67EB0 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = E9E7A5DB2C0244E900B67EB0 /* README.md */; };
 		E9E7A5DE2C0733D800B67EB0 /* TrackerCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7A5DD2C0733D800B67EB0 /* TrackerCollectionViewCell.swift */; };
 		E9E7A5E12C0734A500B67EB0 /* TrackerCollectionSupplementaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7A5E02C0734A500B67EB0 /* TrackerCollectionSupplementaryView.swift */; };
@@ -74,6 +75,7 @@
 		E9D3121D2BBDF07C00F8C0E5 /* LaunchScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchScreenViewController.swift; sourceTree = "<group>"; };
 		E9D3121F2BC4834300F8C0E5 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		E9D312212BC4846A00F8C0E5 /* StatisticViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticViewController.swift; sourceTree = "<group>"; };
+		E9DB9CE72C245861005409B3 /* TrackerDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TrackerDataModel.xcdatamodel; sourceTree = "<group>"; };
 		E9E7A5DB2C0244E900B67EB0 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		E9E7A5DD2C0733D800B67EB0 /* TrackerCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCollectionViewCell.swift; sourceTree = "<group>"; };
 		E9E7A5E02C0734A500B67EB0 /* TrackerCollectionSupplementaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCollectionSupplementaryView.swift; sourceTree = "<group>"; };
@@ -197,6 +199,7 @@
 				E95415772BFCE10400562193 /* SupplementaryView.swift */,
 				E9E7A5DD2C0733D800B67EB0 /* TrackerCollectionViewCell.swift */,
 				E9E7A5E02C0734A500B67EB0 /* TrackerCollectionSupplementaryView.swift */,
+				E9DB9CE62C245861005409B3 /* TrackerDataModel.xcdatamodeld */,
 			);
 			path = Tracker;
 			sourceTree = "<group>";
@@ -363,6 +366,7 @@
 				E9E7A5E12C0734A500B67EB0 /* TrackerCollectionSupplementaryView.swift in Sources */,
 				E9E7A5DE2C0733D800B67EB0 /* TrackerCollectionViewCell.swift in Sources */,
 				E954154A2BF6865E00562193 /* TrackerRecord.swift in Sources */,
+				E9DB9CE82C245861005409B3 /* TrackerDataModel.xcdatamodeld in Sources */,
 				E9C43B0D2C18883500AD6BA8 /* ScheduleViewController.swift in Sources */,
 				E9D312202BC4834300F8C0E5 /* TabBarController.swift in Sources */,
 				E9C43B082C1887DA00AD6BA8 /* CreateNewCategoryViewController.swift in Sources */,
@@ -701,6 +705,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		E9DB9CE62C245861005409B3 /* TrackerDataModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				E9DB9CE72C245861005409B3 /* TrackerDataModel.xcdatamodel */,
+			);
+			currentVersion = E9DB9CE72C245861005409B3 /* TrackerDataModel.xcdatamodel */;
+			path = TrackerDataModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = E9D311E22BBDE13400F8C0E5 /* Project object */;
 }
