@@ -9,6 +9,7 @@ import UIKit
 import CoreData
 
 protocol TrackerCategoryDelegate: AnyObject {
+    func trackerCategoryDidUpdate()
 }
 
 final class TrackerCategoryStore: NSObject {
@@ -21,8 +22,11 @@ final class TrackerCategoryStore: NSObject {
     
     // список категорий получаемых из Core Data
     var categories: [TrackerCategory] {
-        return categories
+        let categories = try? getListCategories().map { try self.convertToTrackerCategory($0) }
+        return categories ?? []
     }
+    
+    private let trackerStore = TrackerStore.shared
     
     // контекст Core Data
     private let context: NSManagedObjectContext
@@ -56,6 +60,63 @@ final class TrackerCategoryStore: NSObject {
         try? controller.performFetch()
     }
     
+    // Создание новой категории в Core Data
+    func createCategoryCoreData(with header: String) throws {
+        let category = TrackerCategoryCoreData(context: context)
+        category.header = header
+        category.tracker = []
+        try saveContext()
+    }
+    
+    // Преобразование объекта Core Data в объект TrackerCategory
+    func convertToTrackerCategory(_ model: TrackerCategoryCoreData) throws -> TrackerCategory {
+        guard let tracker = model.tracker else {
+            throw fatalError("Ошибка в трекере")
+        }
+        
+        guard let header = model.header else {
+            throw fatalError("Ошибка в заголовке")
+        }
+        
+        let category = TrackerCategory(
+            header: header,
+            trackers: tracker.compactMap { coreDataTracker -> Tracker? in
+                if let coreDataTracker = coreDataTracker as? TrackerCoreData {
+                    return try? trackerStore.convertTrackerFromCoreData(coreDataTracker)
+                } else {
+                    return nil
+                }
+            })
+        return category
+    }
+    
+    // Получение категории по названию
+    func fetchTrackerCategoryCoreData(title: String) throws -> TrackerCategoryCoreData? {
+        let request = TrackerCategoryCoreData.fetchRequest()
+        request.predicate = NSPredicate(
+            format: "%K == %@",
+            #keyPath(TrackerCategoryCoreData.header), title)
+        guard let category = try context.fetch(request).first else {
+            throw fatalError("Ошибка в запросе по названию")
+        }
+        return category
+    }
+    
+    // Получение списка всех категорий
+    func getListCategories() throws -> [TrackerCategoryCoreData] {
+        let request = TrackerCategoryCoreData.fetchRequest()
+        request.returnsObjectsAsFaults = false
+        var list: [TrackerCategoryCoreData]?
+        do {
+            list = try context.fetch(request)
+        } catch {
+            throw fatalError("Ошибка в запросе")
+        }
+        guard let categories = list else { fatalError("Ошибка в запросе")}
+        return categories
+    }
+    
+    // сохраняем контекст
     private func saveContext() throws {
         guard context.hasChanges else { return }
         do {
@@ -68,5 +129,8 @@ final class TrackerCategoryStore: NSObject {
 }
 
 extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
-    
+    // Метод делегата, вызываемый при изменении данных.
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        delegate?.trackerCategoryDidUpdate()
+    }
 }
