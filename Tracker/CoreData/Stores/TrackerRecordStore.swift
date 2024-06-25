@@ -15,7 +15,7 @@ final class TrackerRecordStore: NSObject {
     
     // Список записей, получаемых из Core Data
     var records: [TrackerRecord]? {
-        return []
+        try? getTrackerRecords() ?? []
     }
     
     // Контекст Core Data
@@ -44,6 +44,19 @@ final class TrackerRecordStore: NSObject {
         return newTrackerRecord
     }
     
+    // удаление записи из Core Data
+    func removeRecordCoreData(_ id: UUID, with date: Date) throws {
+        let request = TrackerRecordCoreData.fetchRequest()
+        let trackerRecords = try context.fetch(request)
+        let filterRecord = trackerRecords.first {
+            $0.id == id && $0.date == date
+        }
+        if let trackerRecordCoreData = filterRecord {
+            context.delete(trackerRecordCoreData)
+            try saveContext()
+        }
+    }
+    
     // Сохранение изменений в контексте Core Data
     private func saveContext() throws {
         guard context.hasChanges else { return }
@@ -53,5 +66,24 @@ final class TrackerRecordStore: NSObject {
             context.rollback()
             throw error
         }
+    }
+    
+    // Получение всех записей
+    private func getTrackerRecords() throws -> [TrackerRecord]? {
+        let request = TrackerRecordCoreData.fetchRequest()
+        let objects = try context.fetch(request)
+        let records = try objects.map { try self.createNewRecord($0) }
+        return records
+    }
+    
+    // Преобразование объекта Core Data в объект TrackerRecord
+    private func createNewRecord(_ recordCoreData: TrackerRecordCoreData) throws -> TrackerRecord {
+        guard
+            let id = recordCoreData.id,
+            let date = recordCoreData.date else {
+            throw fatalError("Ошибка в получение id или data")
+        }
+        let trackerRecord = TrackerRecord(id: id, date: date)
+        return trackerRecord
     }
 }
