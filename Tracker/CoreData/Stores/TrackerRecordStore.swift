@@ -36,6 +36,14 @@ final class TrackerRecordStore: NSObject {
         super.init()
     }
     
+    // создание новой записи в Core Data 
+    func createCoreDataTrackerRecord(from record: TrackerRecord) -> TrackerRecordCoreData {
+        let newTrackerRecord = TrackerRecordCoreData(context: context)
+        newTrackerRecord.date = record.date
+        newTrackerRecord.id = record.id
+        return newTrackerRecord
+    }
+    
     // Сохранение изменений в контексте Core Data
     private func saveContext() throws {
         guard context.hasChanges else { return }

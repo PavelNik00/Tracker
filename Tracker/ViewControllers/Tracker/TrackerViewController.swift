@@ -526,3 +526,9 @@ extension TrackerViewController: TrackerCollectionViewCellDelegate {
         
     }
 }
+
+extension TrackerViewController: TrackerStoreDelegate {
+    func trackerStoreDidUpdate() {
+        
+    }
+}

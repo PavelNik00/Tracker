@@ -201,8 +201,8 @@
 			isa = PBXGroup;
 			children = (
 				E9DB9CE62C245861005409B3 /* TrackerDataModel.xcdatamodeld */,
-				E9DB9D1F2C24C193005409B3 /* Stores */,
 				E9DB9D232C2B10FA005409B3 /* UIColorMarshalling.swift */,
+				E9DB9D1F2C24C193005409B3 /* Stores */,
 			);
 			path = CoreData;
 			sourceTree = "<group>";
