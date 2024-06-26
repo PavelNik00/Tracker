@@ -74,7 +74,7 @@ final class TrackerStore: NSObject {
     // метод добавления нового трекера в Core Data
     func addCoreDataTracker(_ tracker: Tracker, with category: TrackerCategoryCoreData) throws {
         let trackerCoreData = TrackerCoreData(context: context)
-        trackerCoreData.id = tracker.id
+        trackerCoreData.identifier = tracker.id
         trackerCoreData.name = tracker.name
         trackerCoreData.color = uiColorMarshalling.hexString(from: tracker.color)
         trackerCoreData.emoji = tracker.emoji
@@ -85,12 +85,12 @@ final class TrackerStore: NSObject {
     
     // преобразование объекта Core Data в объект Tracker
     func convertTrackerFromCoreData(_ modelCoreData: TrackerCoreData) throws -> Tracker {
-        guard let id = modelCoreData.id,
+        guard let id = modelCoreData.identifier,
               let name = modelCoreData.name,
               let colorString = modelCoreData.color,
               let emoji = modelCoreData.emoji,
               let schedule = modelCoreData.schedule else {
-            throw fatalError("Ошибка")
+            fatalError("Ошибка преобразования CoreData в Tracker")
         }
         let color = uiColorMarshalling.color(from: colorString)
             
@@ -99,7 +99,8 @@ final class TrackerStore: NSObject {
                 name: name,
                 color: color,
                 emoji: emoji,
-                schedule: schedule)
+                schedule: schedule 
+        )
     }
     
     // обновление трекера
@@ -107,7 +108,10 @@ final class TrackerStore: NSObject {
         let newRecord = recordStore.createCoreDataTrackerRecord(from: record)
         let request = TrackerCoreData.fetchRequest()
         
-        request.predicate = NSPredicate(format: "%K == %@", #keyPath(TrackerCoreData.id), record.id as CVarArg)
+        request.predicate = NSPredicate(
+            format: "%K == %@",
+            #keyPath(TrackerCoreData.identifier),
+            record.id as CVarArg)
         
         guard let trackers = try? context.fetch(request) else { return }
         if let trackerCoreData = trackers.first {

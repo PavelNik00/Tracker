@@ -48,13 +48,14 @@ final class TrackerCategoryStore: NSObject {
         self.context = context
         super.init()
         let fetchRequest = TrackerCategoryCoreData.fetchRequest()
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "header", ascending: true)]
         
         let controller = NSFetchedResultsController(
             fetchRequest: fetchRequest,
             managedObjectContext: context,
             sectionNameKeyPath: nil,
             cacheName: nil)
+        
         controller.delegate = self
         self.categoryFetchedResultsController = controller
         try? controller.performFetch()
@@ -93,9 +94,11 @@ final class TrackerCategoryStore: NSObject {
     // Получение категории по названию
     func fetchTrackerCategoryCoreData(title: String) throws -> TrackerCategoryCoreData? {
         let request = TrackerCategoryCoreData.fetchRequest()
+        
         request.predicate = NSPredicate(
             format: "%K == %@",
             #keyPath(TrackerCategoryCoreData.header), title)
+        
         guard let category = try context.fetch(request).first else {
             throw fatalError("Ошибка в запросе по названию")
         }
@@ -112,7 +115,9 @@ final class TrackerCategoryStore: NSObject {
         } catch {
             throw fatalError("Ошибка в запросе")
         }
-        guard let categories = list else { fatalError("Ошибка в запросе")}
+        guard let categories = list else {
+            fatalError("Ошибка в запросе")
+        }
         return categories
     }
     

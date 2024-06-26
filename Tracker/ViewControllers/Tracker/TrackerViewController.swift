@@ -383,7 +383,6 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TrackerCell", for: indexPath) as! TrackerCollectionViewCell
         
-        
         cell.delegate = self
         let cellData = categories[indexPath.section]
         guard let tracker = cellData.trackers?[indexPath.row] else { return UICollectionViewCell() }
@@ -523,7 +522,6 @@ extension TrackerViewController: TrackerCollectionViewCellDelegate {
         }
         trackerCollectionView.reloadItems(at: [indexPath])
         print("Удаление \(id) из хранилища записей")
-        
     }
 }
 

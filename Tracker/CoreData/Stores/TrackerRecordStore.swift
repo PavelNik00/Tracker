@@ -40,7 +40,7 @@ final class TrackerRecordStore: NSObject {
     func createCoreDataTrackerRecord(from record: TrackerRecord) -> TrackerRecordCoreData {
         let newTrackerRecord = TrackerRecordCoreData(context: context)
         newTrackerRecord.date = record.date
-        newTrackerRecord.id = record.id
+        newTrackerRecord.identifier = record.id
         return newTrackerRecord
     }
     
@@ -49,7 +49,7 @@ final class TrackerRecordStore: NSObject {
         let request = TrackerRecordCoreData.fetchRequest()
         let trackerRecords = try context.fetch(request)
         let filterRecord = trackerRecords.first {
-            $0.id == id && $0.date == date
+            $0.identifier == id && $0.date == date
         }
         if let trackerRecordCoreData = filterRecord {
             context.delete(trackerRecordCoreData)
@@ -79,7 +79,7 @@ final class TrackerRecordStore: NSObject {
     // Преобразование объекта Core Data в объект TrackerRecord
     private func createNewRecord(_ recordCoreData: TrackerRecordCoreData) throws -> TrackerRecord {
         guard
-            let id = recordCoreData.id,
+            let id = recordCoreData.identifier,
             let date = recordCoreData.date else {
             throw fatalError("Ошибка в получение id или data")
         }
