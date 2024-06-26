@@ -18,8 +18,14 @@ final class CreateNewCategoryViewController: UIViewController, UITextFieldDelega
     var onDismiss: (() -> Void)?
     
     private var category: TrackerCategory?
-    private var categories: [TrackerCategory] = []
+    private var categories: [TrackerCategory] = [] {
+        didSet {
+            onDismiss?()
+        }
+    }
     private var enteredText: String = ""
+    
+    private let categoryStore = TrackerCategoryStore.shared
     
     private let labelHeader: UILabel = {
         let label = UILabel()
@@ -140,17 +146,30 @@ final class CreateNewCategoryViewController: UIViewController, UITextFieldDelega
     
     // обрабатываем нажатие кнопки Готово
     @objc func createCategoryButton() {
+        
         guard let newCategoryName = newCategoryTextField.text, !newCategoryName.isEmpty else { return }
         
-        let newCategory = TrackerCategory(header: newCategoryName, trackers: nil)
-        self.categories.append(newCategory)
+        do {
+            
+            try categoryStore.createCategoryCoreData(with: newCategoryName)
+            
+            print(" ✅ Новая категория \(newCategoryName) добавлена в Core Data")
+        } catch {
+            fatalError("Ошибка при создании категории")
+        }
         
-        delegate?.didCreatedCategory(newCategory)
+//        guard let newCategoryName = newCategoryTextField.text, !newCategoryName.isEmpty else { return }
+//        
+//        let newCategory = TrackerCategory(header: newCategoryName, trackers: nil)
+//        self.category.append(newCategory)
+//        
+//        delegate?.didCreatedCategory(newCategory)
         
         dismiss(animated: true) {
+            self.delegate?.didCreatedCategory(TrackerCategory(header: newCategoryName, trackers: nil))
             self.onDismiss?()
         }
-        print(" ✅ Новая категория \(newCategoryName) создана")
+//        print(" ✅ Новая категория \(newCategoryName) создана")
     }
     
     @objc private func hideKeyboard() {

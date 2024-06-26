@@ -12,7 +12,7 @@ protocol CategoryViewControllerDelegate: AnyObject {
 }
 
 // класс для страницы Категория
-final class CategoryViewController: UIViewController, CreateNewCategoryViewControllerDelegate {
+final class CategoryViewController: UIViewController, CreateNewCategoryViewControllerDelegate, TrackerCategoryDelegate {
     
     weak var delegate: CategoryViewControllerDelegate?
     var categoryToPass: ( (String) -> Void )?
@@ -23,6 +23,8 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
     private var selectedCategory: String?
         
     private var isCheckmarkImageSelected: Bool = false
+    
+    private let categoryStore = TrackerCategoryStore.shared
     
     private let labelHeader: UILabel = {
         let label = UILabel()
@@ -53,9 +55,17 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
         
         view.backgroundColor = .white
         
+        categoryStore.delegate = self
+        trackerCategoryDidUpdate()
+        
         setupLabelHeader()
         setupScreen()
         setupAddCategoryButton()
+    }
+    
+    func trackerCategoryDidUpdate() {
+        categories = categoryStore.categories
+        categoryTableView.reloadData()
     }
     
     func passCategoryToCreatingTrackerVC(selectedCategory: String) {
@@ -167,6 +177,7 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
         } else {
             setupCategoryTableView()
             setupAddCategoryButton()
+            trackerCategoryDidUpdate()
         }
     }
     
