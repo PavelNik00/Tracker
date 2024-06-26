@@ -247,23 +247,33 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        // установка чекмарка на ячейке
-        if let selectedIndexPath = selectedIndexPath,
-           let selectedCell = tableView.cellForRow(at: selectedIndexPath) as? CategoryCell {
-            selectedCell.checkmarkImage.isHidden = true
+        if selectedIndexPath == indexPath {
+            // Снимаем выделение при повторном нажатии
+            if let cell = tableView.cellForRow(at: indexPath) as? CategoryCell {
+                cell.checkmarkImage.isHidden = true
+            }
+            selectedIndexPath = nil
+            selectedCategory = nil
+            isCheckmarkImageSelected = false
             updateCategoryButtonTitle()
-            tableView.reloadData()
-        }
-        
-        // установка чекмарка но новой ячейке
-        if let cell = tableView.cellForRow(at: indexPath) as? CategoryCell {
-            cell.checkmarkImage.isHidden = false
-            isCheckmarkImageSelected = !cell.checkmarkImage.isHidden
+        } else {
+            // Снимаем старое выделение
+            if let selectedIndexPath = selectedIndexPath,
+               let selectedCell = tableView.cellForRow(at: selectedIndexPath) as? CategoryCell {
+                selectedCell.checkmarkImage.isHidden = true
+            }
+            
+            // Устанавливаем новое выделение
+            if let cell = tableView.cellForRow(at: indexPath) as? CategoryCell {
+                cell.checkmarkImage.isHidden = false
+            }
             selectedIndexPath = indexPath
             selectedCategory = categories[indexPath.row].header
+            isCheckmarkImageSelected = true
             updateCategoryButtonTitle()
-            tableView.reloadData()
         }
+        
+        tableView.reloadData()
     }
     
     // обновление кнопки Готово
