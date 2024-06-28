@@ -41,6 +41,7 @@ final class TrackerRecordStore: NSObject {
         let newTrackerRecord = TrackerRecordCoreData(context: context)
         newTrackerRecord.date = record.date
         newTrackerRecord.identifier = record.id
+        print("✅ Создан новый \(newTrackerRecord) для записи")
         return newTrackerRecord
     }
     
@@ -53,6 +54,7 @@ final class TrackerRecordStore: NSObject {
         }
         if let trackerRecordCoreData = filterRecord {
             context.delete(trackerRecordCoreData)
+            print("✅ \(trackerRecordCoreData) удален из записи")
             try saveContext()
         }
     }
@@ -73,6 +75,7 @@ final class TrackerRecordStore: NSObject {
         let request = TrackerRecordCoreData.fetchRequest()
         let objects = try context.fetch(request)
         let records = try objects.map { try self.createNewRecord($0) }
+        print("✅ \(records) добавлен в запись")
         return records
     }
     
@@ -84,6 +87,23 @@ final class TrackerRecordStore: NSObject {
             throw NSError(domain: "com.myapp.error", code: 1003, userInfo: [NSLocalizedDescriptionKey: "Ошибка в получение id или data"])
         }
         let trackerRecord = TrackerRecord(id: id, date: date)
+        print("✅ Создан\(trackerRecord) для записи")
         return trackerRecord
+    }
+    
+    // Метод для удаления всех записей
+    func deleteAllRecords() {
+        let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
+        
+        do {
+            let records = try context.fetch(fetchRequest)
+            for record in records {
+                context.delete(record)
+            }
+            try saveContext()
+            print("Все записи удалены")
+        } catch {
+            print("Ошибка при удалении записей: \(error)")
+        }
     }
 }

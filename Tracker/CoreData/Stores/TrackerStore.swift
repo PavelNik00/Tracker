@@ -49,6 +49,7 @@ final class TrackerStore: NSObject {
             fatalError("Ошибка с инициализацией AppDelegate")
         }
         let context = appDelegate.persistentContainer.viewContext
+        
         self.init(context: context)
     }
     
@@ -132,6 +133,22 @@ final class TrackerStore: NSObject {
         } catch {
             context.rollback()
             throw error
+        }
+    }
+    
+    // Метод для удаления всех трекеров
+    func deleteAllTrackers() {
+        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        
+        do {
+            let trackers = try context.fetch(fetchRequest)
+            for tracker in trackers {
+                context.delete(tracker)
+            }
+            try saveContext()
+            print("Все трекеры удалены")
+        } catch {
+            print("Ошибка при удалении трекеров: \(error)")
         }
     }
 }

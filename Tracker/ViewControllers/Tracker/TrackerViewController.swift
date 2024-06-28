@@ -75,7 +75,6 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         super.viewDidLoad()
         
         view.backgroundColor = .white
-        
         trackerStore.delegate = self
         
         newEventViewController.eventCreateDelegate = self
@@ -92,6 +91,11 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         updateView()
         
         setupNavigationBar()
+        
+        // методы для очистки Core Data
+//        trackerStore.deleteAllTrackers()
+//        categoryStore.deleteAllCategories()
+//        recordStore.deleteAllRecords()
     }
     
     func reloadData() {
@@ -339,8 +343,10 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
     private func updateMadeTrackers() {
         if let records = recordStore.records {
             self.completedTrackers = records
+            print("✅ Обновление записи трекеров \(records)")
         } else {
             self.completedTrackers = []
+            print("❗️Трекер \(completedTrackers) не добавлен в запись")
         }
     }
     
@@ -585,21 +591,6 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
         return trackerRecord.id == id && isSameDay
     }
     
-//    private func createTracker(_ tracker: Tracker, with categoryName: String) {
-//        do {
-//        if let categoryFromCoreData = try categoryStore.fetchTrackerCategoryCoreData(title: categoryName ) {
-//        //                // Создание нового трекера в Core Data
-//            let newTracker = try trackerStore.addCoreDataTracker(tracker, with: categoryFromCoreData) { result in
-//                switch result {
-//                case .success:
-//                    print("Трекер успешно создан и сохранен в Core Data")
-//                    self.updateView()
-//                case .failure(let error):
-//                    print("Ошибка при создании трекера: \(error)")
-//                }
-//            }
-//        }
-    
     func createTracker(_ tracker: Tracker, with categoryName: String) {
         do {
             print("Начало создания трекера с категорией: \(categoryName)")
@@ -644,7 +635,7 @@ extension TrackerViewController: TrackerCollectionViewCellDelegate {
 //        completedTrackers.append(trackerRecord) // добавиление в хранилище записей
         
         // обновление для одной ячейки
-//        trackerCollectionView.reloadItems(at: [indexPath])
+        trackerCollectionView.reloadItems(at: [indexPath])
         print("Добавление \(id) в хранилище записей")
     }
     
