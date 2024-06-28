@@ -132,21 +132,21 @@ final class TrackerCategoryStore: NSObject {
         }
     }
     
-    // Метод для удаления всех категорий
-    func deleteAllCategories() {
-        let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
-        
-        do {
-            let categories = try context.fetch(fetchRequest)
-            for category in categories {
-                context.delete(category)
-            }
-            try saveContext()
-            print("Все категории удалены")
-        } catch {
-            print("Ошибка при удалении категорий: \(error)")
-        }
-    }
+//    // Метод для удаления всех категорий
+//    func deleteAllCategories() {
+//        let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+//        
+//        do {
+//            let categories = try context.fetch(fetchRequest)
+//            for category in categories {
+//                context.delete(category)
+//            }
+//            try saveContext()
+//            print("Все категории удалены")
+//        } catch {
+//            print("Ошибка при удалении категорий: \(error)")
+//        }
+//    }
 }
 
 extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {

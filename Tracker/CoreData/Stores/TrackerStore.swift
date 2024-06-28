@@ -136,21 +136,21 @@ final class TrackerStore: NSObject {
         }
     }
     
-    // Метод для удаления всех трекеров
-    func deleteAllTrackers() {
-        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
-        
-        do {
-            let trackers = try context.fetch(fetchRequest)
-            for tracker in trackers {
-                context.delete(tracker)
-            }
-            try saveContext()
-            print("Все трекеры удалены")
-        } catch {
-            print("Ошибка при удалении трекеров: \(error)")
-        }
-    }
+//    // Метод для удаления всех трекеров
+//    func deleteAllTrackers() {
+//        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+//        
+//        do {
+//            let trackers = try context.fetch(fetchRequest)
+//            for tracker in trackers {
+//                context.delete(tracker)
+//            }
+//            try saveContext()
+//            print("Все трекеры удалены")
+//        } catch {
+//            print("Ошибка при удалении трекеров: \(error)")
+//        }
+//    }
 }
 
 extension TrackerStore: NSFetchedResultsControllerDelegate {

@@ -48,14 +48,22 @@ final class TrackerRecordStore: NSObject {
     // удаление записи из Core Data
     func removeRecordCoreData(_ id: UUID, with date: Date) throws {
         let request = TrackerRecordCoreData.fetchRequest()
-        let trackerRecords = try context.fetch(request)
-        let filterRecord = trackerRecords.first {
-            $0.identifier == id && $0.date == date
-        }
-        if let trackerRecordCoreData = filterRecord {
-            context.delete(trackerRecordCoreData)
-            print("✅ \(trackerRecordCoreData) удален из записи")
-            try saveContext()
+        
+        do {
+            let trackerRecords = try context.fetch(request)
+            let filteredRecord = trackerRecords.first {
+                $0.identifier == id && $0.date == date
+            }
+            if let trackerRecordCoreData = filteredRecord {
+                context.delete(trackerRecordCoreData)
+                print("✅ Трекер \(trackerRecordCoreData) удален из записи")
+                try saveContext()
+            } else {
+                print("Запись с id \(id) и датой \(date) не найдена")
+            }
+        } catch {
+            print("Ошибка при удалении трекера из хранилища: \(error)")
+            throw error
         }
     }
     
@@ -75,7 +83,7 @@ final class TrackerRecordStore: NSObject {
         let request = TrackerRecordCoreData.fetchRequest()
         let objects = try context.fetch(request)
         let records = try objects.map { try self.createNewRecord($0) }
-        print("✅ \(records) добавлен в запись")
+        print("✅ Трекеры \(records) находятся в записи")
         return records
     }
     
@@ -87,9 +95,22 @@ final class TrackerRecordStore: NSObject {
             throw NSError(domain: "com.myapp.error", code: 1003, userInfo: [NSLocalizedDescriptionKey: "Ошибка в получение id или data"])
         }
         let trackerRecord = TrackerRecord(id: id, date: date)
-        print("✅ Создан\(trackerRecord) для записи")
+        print("✅ Создан \(trackerRecord) для записи")
         return trackerRecord
     }
+    
+    func countRecords() -> Int {
+        let request: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
+        do {
+            let count = try context.count(for: request)
+            print("В хранилище \(count) записей")
+            return count
+        } catch {
+            print("Ошибка при получении количества записей: \(error)")
+            return 0
+        }
+    }
+
     
     // Метод для удаления всех записей
     func deleteAllRecords() {

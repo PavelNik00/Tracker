@@ -200,8 +200,10 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         
         if isCompletedToday {
             delegate?.uncompletedTracker(id: trackerId, at: indexPath)
+            print("Вызван делегат на не завершения трекера \(trackerId)")
         } else {
             delegate?.completedTracker(id: trackerId, at: indexPath)
+            print("Вызван делегат на завершение трекера \(trackerId)")
         }
         print("Нажата клавиша +")
     }
