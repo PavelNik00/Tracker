@@ -81,6 +81,7 @@ final class TrackerStore: NSObject {
         trackerCoreData.schedule = tracker.schedule
         trackerCoreData.category = category
         try saveContext()
+        print("✅ Трекер \(trackerCoreData) добавлен в Core Data ")
     }
     
     // преобразование объекта Core Data в объект Tracker
@@ -90,10 +91,12 @@ final class TrackerStore: NSObject {
               let colorString = modelCoreData.color,
               let emoji = modelCoreData.emoji,
               let schedule = modelCoreData.schedule else {
-            fatalError("Ошибка преобразования CoreData в Tracker")
+            throw NSError(domain: "com.myapp.error", code: 1001, userInfo: [NSLocalizedDescriptionKey: "Ошибка преобразования CoreData в Tracker"])
         }
         let color = uiColorMarshalling.color(from: colorString)
-            
+        
+        print("✅ Трекер \(Tracker.init(id: id, name: name, color: color, emoji: emoji, schedule: schedule)) находится в Core Data")
+        
         return Tracker(
                 id: id,
                 name: name,
@@ -118,10 +121,11 @@ final class TrackerStore: NSObject {
             trackerCoreData.addToRecord(newRecord)
             try saveContext()
         }
+        print("✅ Трекер \(trackers) сохранен в Core Data")
     }
     
     // метод для сохранения контекста
-    private func saveContext() throws {
+    func saveContext() throws {
         guard context.hasChanges else { return }
         do {
             try context.save()

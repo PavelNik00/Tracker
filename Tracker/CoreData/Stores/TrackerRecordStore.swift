@@ -81,7 +81,7 @@ final class TrackerRecordStore: NSObject {
         guard
             let id = recordCoreData.identifier,
             let date = recordCoreData.date else {
-            throw fatalError("Ошибка в получение id или data")
+            throw NSError(domain: "com.myapp.error", code: 1003, userInfo: [NSLocalizedDescriptionKey: "Ошибка в получение id или data"])
         }
         let trackerRecord = TrackerRecord(id: id, date: date)
         return trackerRecord

@@ -65,18 +65,18 @@ final class TrackerCategoryStore: NSObject {
     func createCategoryCoreData(with header: String) throws {
         let category = TrackerCategoryCoreData(context: context)
         category.header = header
-        category.tracker = []
+        category.trackers = []
         try saveContext()
     }
     
     // Преобразование объекта Core Data в объект TrackerCategory
     func convertToTrackerCategory(_ model: TrackerCategoryCoreData) throws -> TrackerCategory {
-        guard let tracker = model.tracker else {
-            throw fatalError("Ошибка в трекере")
+        guard let tracker = model.trackers else {
+            throw NSError(domain: "com.myapp.error", code: 1002, userInfo: [NSLocalizedDescriptionKey: "Ошибка в заголовке"])
         }
         
         guard let header = model.header else {
-            throw fatalError("Ошибка в заголовке")
+            throw NSError(domain: "com.myapp.error", code: 1002, userInfo: [NSLocalizedDescriptionKey: "Ошибка в заголовке"])
         }
         
         let category = TrackerCategory(
@@ -100,7 +100,7 @@ final class TrackerCategoryStore: NSObject {
             #keyPath(TrackerCategoryCoreData.header), title)
         
         guard let category = try context.fetch(request).first else {
-            throw fatalError("Ошибка в запросе по названию")
+            throw NSError(domain: "com.myapp.error", code: 1002, userInfo: [NSLocalizedDescriptionKey: "Ошибка в названии"])
         }
         return category
     }
@@ -113,7 +113,7 @@ final class TrackerCategoryStore: NSObject {
         do {
             list = try context.fetch(request)
         } catch {
-            throw fatalError("Ошибка в запросе")
+            throw NSError(domain: "com.myapp.error", code: 1002, userInfo: [NSLocalizedDescriptionKey: "Ошибка в запросе"])
         }
         guard let categories = list else {
             fatalError("Ошибка в запросе")
@@ -122,7 +122,7 @@ final class TrackerCategoryStore: NSObject {
     }
     
     // сохраняем контекст
-    private func saveContext() throws {
+    func saveContext() throws {
         guard context.hasChanges else { return }
         do {
             try context.save()
