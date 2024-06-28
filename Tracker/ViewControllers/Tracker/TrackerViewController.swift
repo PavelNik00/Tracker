@@ -172,7 +172,7 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
                     trackers: updateTrackerArray)
                 
                 visibleCategories[categoryIndex] = updatedCategory
-                createTracker(newHabit, with: updatedCategory.header )
+                createTracker(newHabit, with: updatedCategory.header)
             } else {
                 
                 let newCategory = TrackerCategory(
@@ -180,7 +180,7 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
                     trackers: [newHabit])
                 
                 visibleCategories.append(newCategory)
-                createTracker(newHabit, with: newCategory.header )
+                createTracker(newHabit, with: newCategory.header)
             }
             trackerCollectionView.reloadData()
         }
@@ -210,9 +210,9 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
                                    emoji: selectedEmojiString ?? "⭕️",
                                    schedule: [selectedDaysString] )
             
-            if let categoryIndex = categories.firstIndex(where: { $0.header == selectedCategoryName }) {
+            if let categoryIndex = visibleCategories.firstIndex(where: { $0.header == selectedCategoryName }) {
                 
-                let category = categories[categoryIndex]
+                let category = visibleCategories[categoryIndex]
                 var updateTrackerArray = category.trackers ?? []
                 updateTrackerArray.append(newEvent)
                 
@@ -220,15 +220,16 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
                     header: category.header,
                     trackers: updateTrackerArray)
                 
-                categories[categoryIndex] = updatedCategory
-                
+                visibleCategories[categoryIndex] = updatedCategory
+                createTracker(newEvent, with: updatedCategory.header)
             } else {
                 
                 let newCategory = TrackerCategory(
                     header: selectedCategoryName ?? "Неопознанная категория :(",
                     trackers: [newEvent])
                 
-                categories.append(newCategory)
+                visibleCategories.append(newCategory)
+                createTracker(newEvent, with: newCategory.header )
             }
             trackerCollectionView.reloadData()
             
