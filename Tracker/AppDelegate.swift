@@ -5,6 +5,8 @@
 //  Created by Pavel Nikipelov on 03.04.2024.
 //
 
+// обновление для сохранений комментариев к коду перед ревью 15-го спринта
+
 import UIKit
 import CoreData
 
