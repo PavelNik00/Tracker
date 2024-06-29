@@ -73,6 +73,10 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // методы для очистки Core Data
+        // trackerStore.deleteAllTrackers()
+        // categoryStore.deleteAllCategories()
         recordStore.deleteAllRecords()
         view.backgroundColor = .white
         trackerStore.delegate = self
@@ -83,19 +87,20 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         updateTrackerCategories()
         updateMadeTrackers()
         
+        setupErrorImage()
+        setuplabelQuestion()
+        
         reloadData()
         
         setuplabelTrackerTitle()
         setupSearchBar()
         
         setupNavigationBar()
+        updateView()
+        
+        
 //        reloadVisibleCategories()
 //        updateView()
-        
-        // методы для очистки Core Data
-//        trackerStore.deleteAllTrackers()
-//        categoryStore.deleteAllCategories()
-        
     }
     
     func reloadData() {
@@ -242,23 +247,26 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
     }
     
     private func updateView() {
-        if !isHabitExistsForSelectedDate() &&
-            categories.isEmpty &&
+        if !isHabitExistsForSelectedDate() ||
             visibleCategories.isEmpty {
-            setupErrorImage()
-            setuplabelQuestion()
+//            setupErrorImage()
+            errorImage.isHidden = false
+            labelQuestion.isHidden = false
             trackerCollectionView.isHidden = true
             print("Загрузка картинки и рыбы-текста")
         } else {
 //            updateTrackerCategories()
 //            updateMadeTrackers()
-            removeErrorImageAndLabelQuestion()
+            errorImage.isHidden = true
+            labelQuestion.isHidden = true
+//            removeErrorImageAndLabelQuestion()
             setupTrackerCollectionView()
+            trackerCollectionView.isHidden = false
             print("Загрузка коллекции")
         }
         trackerCollectionView.reloadData()
     }
-    
+
     private func removeErrorImageAndLabelQuestion() {
         errorImage.removeFromSuperview()
         labelQuestion.removeFromSuperview()
@@ -416,11 +424,11 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         dateFormatter.dateFormat = "dd.MM.yy"
         let formattedDate = dateFormatter.string(from: currentDate)
         
-        if isHabitExistsForSelectedDate() {
-            removeErrorImageAndLabelQuestion()
-        }
+//        if isHabitExistsForSelectedDate() {
+//            removeErrorImageAndLabelQuestion()
+//        }
         
-//        updateView()
+        updateView()
         reloadVisibleCategories()
         print("Выбранная дата: \(formattedDate)")
     }

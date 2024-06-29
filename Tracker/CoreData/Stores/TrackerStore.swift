@@ -136,7 +136,7 @@ final class TrackerStore: NSObject {
         }
     }
     
-//    // Метод для удаления всех трекеров
+//     Метод для удаления всех трекеров
 //    func deleteAllTrackers() {
 //        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
 //        
