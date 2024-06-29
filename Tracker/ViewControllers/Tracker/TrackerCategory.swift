@@ -7,7 +7,6 @@
 
 import Foundation
 
-// сущность для хранения трекеров по категориям
 struct TrackerCategory {
     let header: String
     let trackers: [Tracker]?
