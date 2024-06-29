@@ -101,18 +101,18 @@ final class TrackerRecordStore: NSObject {
         }
     }
     
-    //    func deleteAllRecords() {
-    //        let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
-    //        
-    //        do {
-    //            let records = try context.fetch(fetchRequest)
-    //            for record in records {
-    //                context.delete(record)
-    //            }
-    //            try saveContext()
-    //            print("Все записи удалены")
-    //        } catch {
-    //            print("Ошибка при удалении записей: \(error)")
-    //        }
-    //    }
+    func deleteAllRecords() {
+        let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
+        
+        do {
+            let records = try context.fetch(fetchRequest)
+            for record in records {
+                context.delete(record)
+            }
+            try saveContext()
+            print("Все записи удалены")
+        } catch {
+            print("Ошибка при удалении записей: \(error)")
+        }
+    }
 }
