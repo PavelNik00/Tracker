@@ -11,7 +11,6 @@ protocol CreateNewCategoryViewControllerDelegate: AnyObject {
     func didCreatedCategory(_ createdCategory: TrackerCategory)
 }
 
-// класс для создания новой категории
 final class CreateNewCategoryViewController: UIViewController, UITextFieldDelegate {
     
     weak var delegate: CreateNewCategoryViewControllerDelegate?
@@ -79,7 +78,6 @@ final class CreateNewCategoryViewController: UIViewController, UITextFieldDelega
         setupTextField()
         setupReadyButton()
         
-        // метод для закртия клавиатуры по тапу на экран
         let tapGuesture = UITapGestureRecognizer(target: self,
                                                  action: #selector(hideKeyboard))
         tapGuesture.cancelsTouchesInView = false
@@ -122,7 +120,6 @@ final class CreateNewCategoryViewController: UIViewController, UITextFieldDelega
         ])
     }
     
-    // метод для закрытия клавиатуры по нажатию на return
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
@@ -144,7 +141,6 @@ final class CreateNewCategoryViewController: UIViewController, UITextFieldDelega
         }
     }
     
-    // обрабатываем нажатие кнопки Готово
     @objc func createCategoryButton() {
         
         guard let newCategoryName = newCategoryTextField.text, !newCategoryName.isEmpty else { return }
@@ -158,18 +154,10 @@ final class CreateNewCategoryViewController: UIViewController, UITextFieldDelega
             fatalError("Ошибка при создании категории")
         }
         
-//        guard let newCategoryName = newCategoryTextField.text, !newCategoryName.isEmpty else { return }
-//        
-//        let newCategory = TrackerCategory(header: newCategoryName, trackers: nil)
-//        self.category.append(newCategory)
-//        
-//        delegate?.didCreatedCategory(newCategory)
-        
         dismiss(animated: true) {
             self.delegate?.didCreatedCategory(TrackerCategory(header: newCategoryName, trackers: nil))
             self.onDismiss?()
         }
-//        print(" ✅ Новая категория \(newCategoryName) создана")
     }
     
     @objc private func hideKeyboard() {

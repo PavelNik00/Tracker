@@ -11,7 +11,6 @@ protocol CategoryViewControllerDelegate: AnyObject {
     func didSelectCategory(_ selectedCategory: String?)
 }
 
-// класс для страницы Категория
 final class CategoryViewController: UIViewController, CreateNewCategoryViewControllerDelegate, TrackerCategoryDelegate {
     
     weak var delegate: CategoryViewControllerDelegate?
@@ -199,15 +198,12 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
     }
 }
 
-// настройка таблицы с созданными категориями
 extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
     
-    // количество категорий
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         categories.count
     }
     
-    // настройка ячейки категории
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath) as! CategoryCell
         
@@ -220,7 +216,6 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
             cell.checkmarkImage.isHidden = true
         }
         
-        // реализация добавления ячеек в таблиц
         let isLast = indexPath.row == (categories.count - 1)
         let isFirst = indexPath.row == 0
         
@@ -243,12 +238,10 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
-    // настройка ячейки при ее выделении
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
         if selectedIndexPath == indexPath {
-            // Снимаем выделение при повторном нажатии
             if let cell = tableView.cellForRow(at: indexPath) as? CategoryCell {
                 cell.checkmarkImage.isHidden = true
             }
@@ -257,13 +250,11 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
             isCheckmarkImageSelected = false
             updateCategoryButtonTitle()
         } else {
-            // Снимаем старое выделение
             if let selectedIndexPath = selectedIndexPath,
                let selectedCell = tableView.cellForRow(at: selectedIndexPath) as? CategoryCell {
                 selectedCell.checkmarkImage.isHidden = true
             }
             
-            // Устанавливаем новое выделение
             if let cell = tableView.cellForRow(at: indexPath) as? CategoryCell {
                 cell.checkmarkImage.isHidden = false
             }
@@ -276,7 +267,6 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
         tableView.reloadData()
     }
     
-    // обновление кнопки Готово
     private func updateCategoryButtonTitle() {
         let categoryButton = view.subviews.compactMap { $0 as? UIButton }.first
         categoryButton?.setTitle(isCheckmarkImageSelected ? "Готово" : "Добавить категорию", for: .normal)

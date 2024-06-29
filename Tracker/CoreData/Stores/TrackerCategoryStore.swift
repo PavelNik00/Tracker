@@ -14,13 +14,10 @@ protocol TrackerCategoryDelegate: AnyObject {
 
 final class TrackerCategoryStore: NSObject {
     
-    // синглтон для хранилища категорий
     static let shared = TrackerCategoryStore()
     
-    // делегат для уведомления об изменении данных
     weak var delegate: TrackerCategoryDelegate?
     
-    // список категорий получаемых из Core Data
     var categories: [TrackerCategory] {
         let categories = try? getListCategories().map { try self.convertToTrackerCategory($0) }
         return categories ?? []
@@ -28,13 +25,10 @@ final class TrackerCategoryStore: NSObject {
     
     private let trackerStore = TrackerStore.shared
     
-    // контекст Core Data
     private let context: NSManagedObjectContext
-
-    // контроллер для отслеживания изменений в категориях
+    
     private var categoryFetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData>?
     
-    // получаем контекст из AppDelegate
     convenience override init() {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             fatalError("Ошибка с инициализацией AppDelegate")
@@ -43,7 +37,6 @@ final class TrackerCategoryStore: NSObject {
         self.init(context: context)
     }
     
-    // настраиваем контроллер для отслеживания изменений в категориях
     init(context: NSManagedObjectContext) {
         self.context = context
         super.init()
@@ -61,7 +54,6 @@ final class TrackerCategoryStore: NSObject {
         try? controller.performFetch()
     }
     
-    // Создание новой категории в Core Data
     func createCategoryCoreData(with header: String) throws {
         let category = TrackerCategoryCoreData(context: context)
         category.header = header
@@ -69,7 +61,6 @@ final class TrackerCategoryStore: NSObject {
         try saveContext()
     }
     
-    // Преобразование объекта Core Data в объект TrackerCategory
     func convertToTrackerCategory(_ model: TrackerCategoryCoreData) throws -> TrackerCategory {
         guard let tracker = model.trackers else {
             throw NSError(domain: "com.myapp.error", code: 1002, userInfo: [NSLocalizedDescriptionKey: "Ошибка в заголовке"])
@@ -91,7 +82,6 @@ final class TrackerCategoryStore: NSObject {
         return category
     }
     
-    // Получение категории по названию
     func fetchTrackerCategoryCoreData(title: String) throws -> TrackerCategoryCoreData? {
         let request = TrackerCategoryCoreData.fetchRequest()
         
@@ -105,7 +95,6 @@ final class TrackerCategoryStore: NSObject {
         return category
     }
     
-    // Получение списка всех категорий
     func getListCategories() throws -> [TrackerCategoryCoreData] {
         let request = TrackerCategoryCoreData.fetchRequest()
         request.returnsObjectsAsFaults = false
@@ -121,7 +110,6 @@ final class TrackerCategoryStore: NSObject {
         return categories
     }
     
-    // сохраняем контекст
     func saveContext() throws {
         guard context.hasChanges else { return }
         do {
@@ -132,25 +120,24 @@ final class TrackerCategoryStore: NSObject {
         }
     }
     
-//    // Метод для удаления всех категорий
-//    func deleteAllCategories() {
-//        let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
-//        
-//        do {
-//            let categories = try context.fetch(fetchRequest)
-//            for category in categories {
-//                context.delete(category)
-//            }
-//            try saveContext()
-//            print("Все категории удалены")
-//        } catch {
-//            print("Ошибка при удалении категорий: \(error)")
-//        }
-//    }
+    //    // Метод для удаления всех категорий
+    //    func deleteAllCategories() {
+    //        let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+    //        
+    //        do {
+    //            let categories = try context.fetch(fetchRequest)
+    //            for category in categories {
+    //                context.delete(category)
+    //            }
+    //            try saveContext()
+    //            print("Все категории удалены")
+    //        } catch {
+    //            print("Ошибка при удалении категорий: \(error)")
+    //        }
+    //    }
 }
 
 extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
-    // Метод делегата, вызываемый при изменении данных.
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         delegate?.trackerCategoryDidUpdate()
     }

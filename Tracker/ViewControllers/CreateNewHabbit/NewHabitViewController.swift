@@ -132,7 +132,6 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // задаем заголовок для экрана
         self.title = "Новая привычка"
         view.backgroundColor = .white
                 
@@ -142,7 +141,6 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         setupScrollView()
         setupContentView()
         
-        //        setupLabel()
         setupAddCategoryNameTextField()
         setuplimitTextLabel()
         
@@ -152,17 +150,14 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         setupButtons()
         updateCreateButtonState()
         
-        // добавляем наблюдатель для свойства hidden у лейбла
         limitTextLabel.addObserver(self, forKeyPath: "hidden", options: [.old, .new], context: nil)
         
-        // тапгесчур необходим для закрытия клавиатуры по тапу на пустую область экрана
         let tapGesture = UITapGestureRecognizer(target: self,
                                                 action: #selector(hideKeyBoard))
         tapGesture.cancelsTouchesInView = false
         self.view.addGestureRecognizer(tapGesture)
     }
     
-    // метод для наблюдателя
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == "hidden", let label = object as? UILabel {
             tableViewTopConstraint?.constant = label.isHidden ? 20 : 60
@@ -172,7 +167,6 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         }
     }
     
-    // необходим чтобы избежать утечек памяти (при деинициализации контроллера)
     deinit {
         limitTextLabel.removeObserver(self, forKeyPath: "hidden")
     }
@@ -184,14 +178,12 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         }
     }
     
-    // метод для обновления выбранной категории
     func didSelectCategory(_ selectedCategory: String?) {
         self.selectedCategoryStringForHabit = selectedCategory
         tableView.reloadData()
         updateCreateButtonState()
     }
     
-    // метод для активации кнопки "Создать" для привычки
     func updateCreateButtonState() {
         guard selectedCategory != nil ,
               selectedDays != nil,
@@ -350,23 +342,18 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         ])
     }
     
-    // обработка нажатия TextField
     @objc func addCategoryNameTextFieldEditing(_ textField: UITextField) {
         guard let enteredText = textField.text, !enteredText.isEmpty else { return }
         updateCreateButtonState()
         print("Введен так \(enteredText)")
     }
     
-    // обработка нажатия кнопки "Отменить"
     @objc func cancelButtonDidTap() {
-        // закрываем экран
         self.dismiss(animated: true, completion: nil)
         print("Нажата кнопка Отменить")
     }
     
-    // обработка нажатия кнопки "Создать" для привычки
     @objc func addButtonDidTap() {
-        // прописываем создание привычки
         guard let selectedHabitName = addCategoryNameTextField.text, !selectedHabitName.isEmpty,
               let selectedCategoryString = selectedCategory,
               !selectedCategoryString.isEmpty,
@@ -398,12 +385,10 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
     }
 }
 
-// настраиваем textField
 extension NewHabitViewController: UITextFieldDelegate {
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         guard let text = textField.text else { return true }
-        // вычисляем предполагаемый текст
         let newText = (text as NSString).replacingCharacters(in: range, with: string)
         
         if newText.count <= 37 {
@@ -417,22 +402,18 @@ extension NewHabitViewController: UITextFieldDelegate {
         return newText.count <= 38
     }
     
-    // метод для закрытия клавиатуры при нажатии на "return"
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
     }
 }
 
-// настройка таблицы
 extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
     
-    // количество ячеек
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return tableViewRows.count
     }
     
-    // задаем параметры для ячейки
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableViewRows[indexPath.row]
         if cell == "Категория" {
@@ -446,15 +427,12 @@ extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
             cell.backgroundColor = UIColor(named: "Light Grey")?.withAlphaComponent(0.3)
             cell.selectionStyle = .none
             
-            // настройка для картинки в ячейки
             let iconImage = UIImageView(frame: CGRect(x: 0, y: 0, width: 24, height: 24))
             iconImage.image = UIImage(named: "icon_next")
             cell.accessoryView = iconImage
             
-            // Убираем сепаратор у последней ячейки
             if indexPath.row == tableViewRows.count - 1 {
                 cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
-                
             }
             
             updateCreateButtonState()
@@ -470,12 +448,10 @@ extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
             cell.backgroundColor = UIColor(named: "Light Grey")?.withAlphaComponent(0.3)
             cell.selectionStyle = .none
             
-            // настройка для картинки в ячейки
             let iconImage = UIImageView(frame: CGRect(x: 0, y: 0, width: 24, height: 24))
             iconImage.image = UIImage(named: "icon_next")
             cell.accessoryView = iconImage
             
-            // Убираем сепаратор у последней ячейки
             if indexPath.row == tableViewRows.count - 1 {
                 cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
             }
@@ -484,12 +460,10 @@ extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
         }
     }
     
-    // настраиваем высоту ячейки
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 75
     }
     
-    // прописываем логику при нажатии на ячейки таблицы
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let cell = tableViewRows[indexPath.row]
         if cell == "Категория" {
@@ -501,7 +475,6 @@ extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
             }
             navigationVC.modalPresentationStyle = .pageSheet
             present(navigationVC, animated: true)
-            //            print("Button Категория tapped")
         } else {
             let navigationVC = ScheduleViewController()
             navigationVC.scheduleToPass = { [weak self] selectedDays in
@@ -515,10 +488,8 @@ extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
-// настройка коллекции emoji
 extension NewHabitViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
-    // настройка количества ячеек для коллекции
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == emojiCollection {
             emojiArray.count
@@ -527,7 +498,6 @@ extension NewHabitViewController: UICollectionViewDataSource, UICollectionViewDe
         }
     }
     
-    // настройка ячейки коллекции
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if collectionView == emojiCollection {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "emojiCell", for: indexPath) as? EmojiCollectionViewCell
@@ -550,13 +520,11 @@ extension NewHabitViewController: UICollectionViewDataSource, UICollectionViewDe
         }
     }
     
-    // настройка выделения ячейки коллекции при тапе на нее
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == emojiCollection {
             let cell = emojiCollection.cellForItem(at: indexPath)
             cell?.contentView.layer.cornerRadius = 16
             cell?.contentView.backgroundColor = UIColor(named: "Light Grey")
-            // выбор ячейки с емодзи
             selectedEmoji = emojiArray[indexPath.row]
             updateCreateButtonState()
             print("Выбран эмодзи \(selectedEmoji ?? "")")
@@ -565,14 +533,12 @@ extension NewHabitViewController: UICollectionViewDataSource, UICollectionViewDe
             cell?.layer.borderWidth = 3
             cell?.layer.cornerRadius = 8
             cell?.layer.borderColor = colorArray[indexPath.row].cgColor
-            // выбор ячейки с цветом
             selectedColor = colorArray[indexPath.row]
             updateCreateButtonState()
             print("Выбран цвет \(selectedColor ?? UIColor.black)")
         }
     }
     
-    // настройка отмены выделения при тапе на другую ячейку в коллекции
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
         if collectionView == emojiCollection {
             let cell = emojiCollection.cellForItem(at: indexPath) as! EmojiCollectionViewCell
@@ -594,7 +560,6 @@ extension NewHabitViewController: UICollectionViewDataSource, UICollectionViewDe
         }
     }
     
-    // настройка хедера
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let view = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header", for: indexPath) as! SupplementaryView
         if collectionView == emojiCollection {
@@ -605,17 +570,14 @@ extension NewHabitViewController: UICollectionViewDataSource, UICollectionViewDe
         return view
     }
     
-    // настройка отступа коллекции от хедера
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0)
     }
     
-    // настройка размеров хедера
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: collectionView.frame.width, height: 50)
     }
     
-    // настройка отступа сверху для ячеек коллекции
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 10
     }

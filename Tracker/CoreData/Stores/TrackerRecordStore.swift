@@ -10,18 +10,14 @@ import CoreData
 
 final class TrackerRecordStore: NSObject {
     
-    // Синглтон для хранилища записей
     static let shared = TrackerRecordStore()
     
-    // Список записей, получаемых из Core Data
     var records: [TrackerRecord]? {
         try? getTrackerRecords() ?? []
     }
     
-    // Контекст Core Data
     private let context: NSManagedObjectContext
-
-    // получаем контекст из AppDelegate
+    
     convenience override init() {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             fatalError("Ошибка с инициализацией AppDelegate")
@@ -30,13 +26,11 @@ final class TrackerRecordStore: NSObject {
         self.init(context: context)
     }
     
-    // Инициализатор
     init(context: NSManagedObjectContext) {
         self.context = context
         super.init()
     }
     
-    // создание новой записи в Core Data 
     func createCoreDataTrackerRecord(from record: TrackerRecord) -> TrackerRecordCoreData {
         let newTrackerRecord = TrackerRecordCoreData(context: context)
         newTrackerRecord.date = record.date
@@ -45,7 +39,6 @@ final class TrackerRecordStore: NSObject {
         return newTrackerRecord
     }
     
-    // удаление записи из Core Data
     func removeRecordCoreData(_ id: UUID, with date: Date) throws {
         let request = TrackerRecordCoreData.fetchRequest()
         
@@ -67,7 +60,6 @@ final class TrackerRecordStore: NSObject {
         }
     }
     
-    // Сохранение изменений в контексте Core Data
     private func saveContext() throws {
         guard context.hasChanges else { return }
         do {
@@ -78,7 +70,6 @@ final class TrackerRecordStore: NSObject {
         }
     }
     
-    // Получение всех записей
     private func getTrackerRecords() throws -> [TrackerRecord]? {
         let request = TrackerRecordCoreData.fetchRequest()
         let objects = try context.fetch(request)
@@ -87,7 +78,6 @@ final class TrackerRecordStore: NSObject {
         return records
     }
     
-    // Преобразование объекта Core Data в объект TrackerRecord
     private func createNewRecord(_ recordCoreData: TrackerRecordCoreData) throws -> TrackerRecord {
         guard
             let id = recordCoreData.identifier,
@@ -110,21 +100,19 @@ final class TrackerRecordStore: NSObject {
             return 0
         }
     }
-
     
-    // Метод для удаления всех записей
-    func deleteAllRecords() {
-        let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
-        
-        do {
-            let records = try context.fetch(fetchRequest)
-            for record in records {
-                context.delete(record)
-            }
-            try saveContext()
-            print("Все записи удалены")
-        } catch {
-            print("Ошибка при удалении записей: \(error)")
-        }
-    }
+    //    func deleteAllRecords() {
+    //        let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
+    //        
+    //        do {
+    //            let records = try context.fetch(fetchRequest)
+    //            for record in records {
+    //                context.delete(record)
+    //            }
+    //            try saveContext()
+    //            print("Все записи удалены")
+    //        } catch {
+    //            print("Ошибка при удалении записей: \(error)")
+    //        }
+    //    }
 }

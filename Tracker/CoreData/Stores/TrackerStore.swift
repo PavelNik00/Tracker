@@ -14,13 +14,10 @@ protocol TrackerStoreDelegate: AnyObject {
 
 final class TrackerStore: NSObject {
     
-    // синглтон для доступа
     static let shared = TrackerStore()
     
-    // делегат для уведомления об изменении данных
     weak var delegate: TrackerStoreDelegate?
     
-    // переменная для списка трекеров получаемых из Core Data
     private var trackers: [Tracker] {
         guard
             let objects = self.trackersFetchedResultsController?.fetchedObjects,
@@ -30,19 +27,14 @@ final class TrackerStore: NSObject {
         return trackers
     }
     
-    // преобразование цветов
     private let uiColorMarshalling = UIColorMarshalling()
     
-    // ссылка на хранилище записей трекеров
     private let recordStore = TrackerRecordStore.shared
     
-    // контекст Core Data
     private var context: NSManagedObjectContext
     
-    // контроллер для отслеживания изменений в трекерах
     private var trackersFetchedResultsController: NSFetchedResultsController<TrackerCoreData>?
     
-    // получаем контекст из AppDelegate
     convenience override init() {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate
         else {
@@ -53,7 +45,6 @@ final class TrackerStore: NSObject {
         self.init(context: context)
     }
     
-    // настраиваем контроллер для отслеживания изменений в трекерах
     init(context: NSManagedObjectContext) {
         self.context = context
         super.init()
@@ -72,7 +63,6 @@ final class TrackerStore: NSObject {
         try? controller.performFetch()
     }
     
-    // метод добавления нового трекера в Core Data
     func addCoreDataTracker(_ tracker: Tracker, with category: TrackerCategoryCoreData) throws {
         let trackerCoreData = TrackerCoreData(context: context)
         trackerCoreData.identifier = tracker.id
@@ -82,10 +72,8 @@ final class TrackerStore: NSObject {
         trackerCoreData.schedule = tracker.schedule
         trackerCoreData.category = category
         try saveContext()
-        print("✅ Трекер \(trackerCoreData) добавлен в Core Data ")
     }
     
-    // преобразование объекта Core Data в объект Tracker
     func convertTrackerFromCoreData(_ modelCoreData: TrackerCoreData) throws -> Tracker {
         guard let id = modelCoreData.identifier,
               let name = modelCoreData.name,
@@ -96,18 +84,15 @@ final class TrackerStore: NSObject {
         }
         let color = uiColorMarshalling.color(from: colorString)
         
-        print("✅ Трекер \(Tracker.init(id: id, name: name, color: color, emoji: emoji, schedule: schedule)) находится в Core Data")
-        
         return Tracker(
-                id: id,
-                name: name,
-                color: color,
-                emoji: emoji,
-                schedule: schedule 
+            id: id,
+            name: name,
+            color: color,
+            emoji: emoji,
+            schedule: schedule 
         )
     }
     
-    // обновление трекера
     func trackerUpdate(_ record: TrackerRecord) throws {
         let newRecord = recordStore.createCoreDataTrackerRecord(from: record)
         let request = TrackerCoreData.fetchRequest()
@@ -125,7 +110,6 @@ final class TrackerStore: NSObject {
         print("✅ Трекер \(trackers) сохранен в Core Data")
     }
     
-    // метод для сохранения контекста
     func saveContext() throws {
         guard context.hasChanges else { return }
         do {
@@ -136,25 +120,24 @@ final class TrackerStore: NSObject {
         }
     }
     
-//     Метод для удаления всех трекеров
-//    func deleteAllTrackers() {
-//        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
-//        
-//        do {
-//            let trackers = try context.fetch(fetchRequest)
-//            for tracker in trackers {
-//                context.delete(tracker)
-//            }
-//            try saveContext()
-//            print("Все трекеры удалены")
-//        } catch {
-//            print("Ошибка при удалении трекеров: \(error)")
-//        }
-//    }
+    //     Метод для удаления всех трекеров
+    //    func deleteAllTrackers() {
+    //        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+    //        
+    //        do {
+    //            let trackers = try context.fetch(fetchRequest)
+    //            for tracker in trackers {
+    //                context.delete(tracker)
+    //            }
+    //            try saveContext()
+    //            print("Все трекеры удалены")
+    //        } catch {
+    //            print("Ошибка при удалении трекеров: \(error)")
+    //        }
+    //    }
 }
 
 extension TrackerStore: NSFetchedResultsControllerDelegate {
-    // метод делегата, вызываемый при изменении данных
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         delegate?.trackerStoreDidUpdate()
     }
