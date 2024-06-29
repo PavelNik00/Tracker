@@ -30,11 +30,14 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
     private var selectedColorName: UIColor?
     private var selectedEmojiString: String?
     
-    private let datePicker = UIDatePicker()
-    private let errorImage = UIImageView()
-    private let labelQuestion = UILabel()
+    private lazy var errorSearchImageView = UIImageView()
+    private lazy var noSearchLabel = UILabel()
+    private lazy var errorImage = UIImageView()
+    private lazy var noTrackerLabel = UILabel()
+    
     private let labelTrackerTitle = UILabel()
     private let searchBar = UISearchBar()
+    private let datePicker = UIDatePicker()
     
     private let trackerStore = TrackerStore.shared
     private let categoryStore = TrackerCategoryStore.shared
@@ -97,10 +100,6 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         
         setupNavigationBar()
         updateView()
-        
-        
-//        reloadVisibleCategories()
-//        updateView()
     }
     
     func reloadData() {
@@ -251,14 +250,14 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
             visibleCategories.isEmpty {
 //            setupErrorImage()
             errorImage.isHidden = false
-            labelQuestion.isHidden = false
+            noTrackerLabel.isHidden = false
             trackerCollectionView.isHidden = true
             print("Загрузка картинки и рыбы-текста")
         } else {
 //            updateTrackerCategories()
 //            updateMadeTrackers()
             errorImage.isHidden = true
-            labelQuestion.isHidden = true
+            noTrackerLabel.isHidden = true
 //            removeErrorImageAndLabelQuestion()
             setupTrackerCollectionView()
             trackerCollectionView.isHidden = false
@@ -267,9 +266,10 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         trackerCollectionView.reloadData()
     }
 
+
     private func removeErrorImageAndLabelQuestion() {
         errorImage.removeFromSuperview()
-        labelQuestion.removeFromSuperview()
+        noTrackerLabel.removeFromSuperview()
     }
     
     private func setupErrorImage() {
@@ -284,16 +284,40 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         errorImage.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
     }
     
-    private func setuplabelQuestion() {
-        labelQuestion.translatesAutoresizingMaskIntoConstraints = false
-        labelQuestion.text = "Что будем отслеживать?"
-        labelQuestion.font = .systemFont(ofSize: 12)
-        labelQuestion.sizeToFit()
-        labelQuestion.textAlignment = .center
+    private func setupNoSearchImage() {
+        errorSearchImageView.image = UIImage(named: "icon_search_error")
+        errorSearchImageView.translatesAutoresizingMaskIntoConstraints = false
+        errorSearchImageView.heightAnchor.constraint(equalToConstant: 80).isActive = true
+        errorSearchImageView.widthAnchor.constraint(equalToConstant: 80).isActive = true
+        errorSearchImageView.clipsToBounds = true
         
-        view.addSubview(labelQuestion)
-        labelQuestion.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        labelQuestion.topAnchor.constraint(equalTo: errorImage.bottomAnchor, constant: 8).isActive = true
+        view.addSubview(errorSearchImageView)
+        errorSearchImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        errorSearchImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+    }
+    
+    private func setuplabelQuestion() {
+        noTrackerLabel.translatesAutoresizingMaskIntoConstraints = false
+        noTrackerLabel.text = "Что будем отслеживать?"
+        noTrackerLabel.font = .systemFont(ofSize: 12)
+        noTrackerLabel.sizeToFit()
+        noTrackerLabel.textAlignment = .center
+        
+        view.addSubview(noTrackerLabel)
+        noTrackerLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        noTrackerLabel.topAnchor.constraint(equalTo: errorImage.bottomAnchor, constant: 8).isActive = true
+    }
+    
+    private func setupNoSearchLabel() {
+        noSearchLabel.translatesAutoresizingMaskIntoConstraints = false
+        noSearchLabel.text = "Ничего не найдено"
+        noSearchLabel.font = .systemFont(ofSize: 12)
+        noSearchLabel.sizeToFit()
+        noSearchLabel.textAlignment = .center
+        
+        view.addSubview(noSearchLabel)
+        noSearchLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        noSearchLabel.topAnchor.constraint(equalTo: errorSearchImageView.bottomAnchor, constant: 8).isActive = true
     }
     
     private func setuplabelTrackerTitle() {
