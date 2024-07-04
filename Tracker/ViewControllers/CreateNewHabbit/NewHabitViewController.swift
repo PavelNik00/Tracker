@@ -488,6 +488,8 @@ extension NewHabitViewController: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
+// MARK: - UICollectionViewDelegate, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
+
 extension NewHabitViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {

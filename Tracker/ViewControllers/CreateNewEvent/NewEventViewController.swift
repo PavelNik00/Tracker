@@ -396,6 +396,8 @@ final class NewEventViewController: UIViewController, CategoryViewControllerDele
     }
 }
 
+// MARK: - UITextFieldDelegate
+
 extension NewEventViewController: UITextFieldDelegate {
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
@@ -418,6 +420,8 @@ extension NewEventViewController: UITextFieldDelegate {
         return true
     }
 }
+
+// MARK: - UITableViewDataSource, UITableViewDelegate
 
 extension NewEventViewController: UITableViewDataSource, UITableViewDelegate {
     
@@ -464,6 +468,8 @@ extension NewEventViewController: UITableViewDataSource, UITableViewDelegate {
         present(navigationVC, animated: true)
     }
 }
+
+// MARK: - UICollectionViewDelegate, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
 
 extension NewEventViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     

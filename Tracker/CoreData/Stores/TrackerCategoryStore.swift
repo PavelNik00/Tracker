@@ -5,8 +5,8 @@
 //  Created by Pavel Nikipelov on 20.06.2024.
 //
 
-import UIKit
 import CoreData
+import UIKit
 
 protocol TrackerCategoryDelegate: AnyObject {
     func trackerCategoryDidUpdate()
@@ -136,6 +136,8 @@ final class TrackerCategoryStore: NSObject {
         }
     }
 }
+
+// MARK: - NSFetchedResultsControllerDelegate
 
 extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {

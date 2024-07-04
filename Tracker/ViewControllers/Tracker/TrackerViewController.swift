@@ -5,8 +5,8 @@
 //  Created by Pavel Nikipelov on 03.04.2024.
 //
 
-import UIKit
 import CoreData
+import UIKit
 
 final class TrackerViewController: UIViewController, NewHabitCreateViewControllerDelegate, NewEventCreateViewControllerDelegate {
     
@@ -75,9 +75,9 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         super.viewDidLoad()
         
         // методы для очистки Core Data
-        // trackerStore.deleteAllTrackers()
-        // categoryStore.deleteAllCategories()
-        // recordStore.deleteAllRecords()
+//         trackerStore.deleteAllTrackers()
+//         categoryStore.deleteAllCategories()
+//         recordStore.deleteAllRecords()
         view.backgroundColor = .white
         trackerStore.delegate = self
         
@@ -438,6 +438,8 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
     }
 }
 
+// MARK: - UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout
+
 extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -581,7 +583,7 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
     func createTracker(_ tracker: Tracker, with categoryName: String) {
         do {
             if let categoryFromCoreData = try categoryStore.fetchTrackerCategoryCoreData(title: categoryName) {
-                print("Категория найдена в Core Data")
+                print("✅ Категория найдена в Core Data")
                 let newTracker = try trackerStore.addCoreDataTracker(tracker, with: categoryFromCoreData)
                 
                 updateView()
@@ -595,6 +597,8 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
         }
     }
 }
+
+// MARK: - TrackerCollectionViewCellDelegate
 
 extension TrackerViewController: TrackerCollectionViewCellDelegate {
     
@@ -612,21 +616,27 @@ extension TrackerViewController: TrackerCollectionViewCellDelegate {
     }
     
     func uncompletedTracker(id: UUID, at indexPath: IndexPath) {
-        if let index = completedTrackers.firstIndex(where: { $0.id == id && $0.date == currentDate }) {
+        
+        let calendar = Calendar.current
+        if let index = completedTrackers.firstIndex(where: { $0.id == id && calendar.isDate($0.date, inSameDayAs: currentDate) }) {
+            let recordToDelete = completedTrackers[index]
             completedTrackers.remove(at: index)
             
             do {
                 try TrackerRecordStore.shared.removeRecordCoreData(id, with: currentDate)
+                print("Попытка удалить трекер с \(id) и датой \(currentDate)")
             } catch {
                 print("Ошибка при удалении трекера из хранилища: \(error)")
             }
             
             trackerCollectionView.reloadItems(at: [indexPath])
         } else {
-            print("Запись с id \(id) и датой \(datePicker.date) не найдена")
+            print("Запись с id \(id) и датой \(currentDate) не найдена")
         }
     }
 }
+
+// MARK: - TrackerStoreDelegate
 
 extension TrackerViewController: TrackerStoreDelegate {
     func trackerStoreDidUpdate() {
@@ -636,9 +646,3 @@ extension TrackerViewController: TrackerStoreDelegate {
     }
 }
 
-extension Date {
-    func strippedTime() -> Date {
-        let components = Calendar.current.dateComponents([.year, .month, .day], from: self)
-        return Calendar.current.date(from: components) ?? self
-    }
-}

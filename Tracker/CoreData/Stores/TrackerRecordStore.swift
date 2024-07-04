@@ -5,15 +5,20 @@
 //  Created by Pavel Nikipelov on 20.06.2024.
 //
 
-import UIKit
 import CoreData
+import UIKit
 
 final class TrackerRecordStore: NSObject {
     
     static let shared = TrackerRecordStore()
     
     var records: [TrackerRecord]? {
-        try? getTrackerRecords() ?? []
+        do {
+            return try getTrackerRecords() ?? []
+        } catch {
+            print("Ошибка при получении записей: \(error)")
+            return nil
+        }
     }
     
     private let context: NSManagedObjectContext
@@ -35,7 +40,7 @@ final class TrackerRecordStore: NSObject {
         let newTrackerRecord = TrackerRecordCoreData(context: context)
         newTrackerRecord.date = record.date
         newTrackerRecord.identifier = record.id
-        print("✅ Создан новый \(newTrackerRecord) для записи")
+        print("✅ Создан новый \(newTrackerRecord) для записи c id \(record.id) и датой \(record.date)")
         return newTrackerRecord
     }
     
@@ -44,9 +49,11 @@ final class TrackerRecordStore: NSObject {
         
         do {
             let trackerRecords = try context.fetch(request)
+            let calendar = Calendar.current
             let filteredRecord = trackerRecords.first {
-                $0.identifier == id && $0.date == date
+                $0.identifier == id && calendar.isDate($0.date!, inSameDayAs: date)
             }
+            
             if let trackerRecordCoreData = filteredRecord {
                 context.delete(trackerRecordCoreData)
                 print("✅ Трекер \(trackerRecordCoreData) удален из записи")
@@ -85,7 +92,7 @@ final class TrackerRecordStore: NSObject {
             throw NSError(domain: "com.myapp.error", code: 1003, userInfo: [NSLocalizedDescriptionKey: "Ошибка в получение id или data"])
         }
         let trackerRecord = TrackerRecord(id: id, date: date)
-        print("✅ Создан \(trackerRecord) для записи")
+        print("✅ Создан \(trackerRecord) для записи с id \(id) и датой \(date)")
         return trackerRecord
     }
     

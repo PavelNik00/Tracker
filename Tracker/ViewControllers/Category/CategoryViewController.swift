@@ -194,6 +194,8 @@ final class CategoryViewController: UIViewController, CreateNewCategoryViewContr
     }
 }
 
+// MARK: - UITableViewDelegate, UITableViewDataSource
+
 extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
