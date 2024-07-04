@@ -75,9 +75,9 @@ final class TrackerViewController: UIViewController, NewHabitCreateViewControlle
         super.viewDidLoad()
         
         // методы для очистки Core Data
-//         trackerStore.deleteAllTrackers()
-//         categoryStore.deleteAllCategories()
-//         recordStore.deleteAllRecords()
+        trackerStore.deleteAllTrackers()
+        categoryStore.deleteAllCategories()
+        recordStore.deleteAllRecords()
         view.backgroundColor = .white
         trackerStore.delegate = self
         
@@ -468,7 +468,10 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TrackerCell", for: indexPath) as! TrackerCollectionViewCell
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TrackerCell", for: indexPath) as? TrackerCollectionViewCell else {
+            print("Ошибка: Не удалось создать ячейку TrackerCollectionViewCell")
+            return UICollectionViewCell()
+        }
         
         cell.delegate = self
         let cellData = visibleCategories[indexPath.section]
@@ -504,7 +507,10 @@ extension TrackerViewController: UICollectionViewDelegate, UICollectionViewDataS
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         
-        let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "Header", for: indexPath) as! TrackerCollectionSupplementaryView
+        guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "Header", for: indexPath) as? TrackerCollectionSupplementaryView else {
+            print("Ошибка: Не удалось создать заголовок TrackerCollectionSupplementaryView")
+            return UICollectionReusableView()
+        }
         
         let category = visibleCategories[indexPath.section]
         let filterTrackers = category.trackers?.filter { tracker in

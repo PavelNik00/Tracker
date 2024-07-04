@@ -203,7 +203,10 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath) as! CategoryCell
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath) as? CategoryCell else {
+            print("Ошибка: Не удалось создать ячейку CategoryCell")
+            return UITableViewCell()
+        }
         
         cell.categoryLabel.text = categories[indexPath.row].header
         cell.backgroundColor = UIColor(named: "Light Grey")?.withAlphaComponent(0.3)

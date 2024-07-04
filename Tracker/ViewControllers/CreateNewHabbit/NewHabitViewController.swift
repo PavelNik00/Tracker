@@ -84,17 +84,30 @@ final class NewHabitViewController: UIViewController, CategoryViewControllerDele
         return emojiCollection
     }()
     
-    private let colorArray: [UIColor] = [
-        UIColor(named: "Color selection 1")!, UIColor(named: "Color selection 2")!,
-        UIColor(named: "Color selection 3")!, UIColor(named: "Color selection 4")!,
-        UIColor(named: "Color selection 5")!, UIColor(named: "Color selection 6")!,
-        UIColor(named: "Color selection 7")!, UIColor(named: "Color selection 8")!,
-        UIColor(named: "Color selection 9")!, UIColor(named: "Color selection 10")!,
-        UIColor(named: "Color selection 11")!, UIColor(named: "Color selection 12")!,
-        UIColor(named: "Color selection 13")!, UIColor(named: "Color selection 14")!,
-        UIColor(named: "Color selection 15")!, UIColor(named: "Color selection 16")!,
-        UIColor(named: "Color selection 17")!, UIColor(named: "Color selection 18")!,
-    ]
+    private let colorArray: [UIColor] = {
+        let colorNames = [
+            "Color selection 1", "Color selection 2", 
+            "Color selection 3", "Color selection 4",
+            "Color selection 5", "Color selection 6", 
+            "Color selection 7", "Color selection 8",
+            "Color selection 9", "Color selection 10", 
+            "Color selection 11", "Color selection 12",
+            "Color selection 13", "Color selection 14", 
+            "Color selection 15", "Color selection 16",
+            "Color selection 17", "Color selection 18"
+        ]
+        
+        var colors: [UIColor] = []
+        for name in colorNames {
+            if let color = UIColor(named: name) {
+                colors.append(color)
+            } else {
+                print("Ошибка: Цвет с именем \(name) не найден в ассетах.")
+                colors.append(UIColor.black)
+            }
+        }
+        return colors
+    }()
     
     private let colorCollection: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -543,7 +556,11 @@ extension NewHabitViewController: UICollectionViewDataSource, UICollectionViewDe
     
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
         if collectionView == emojiCollection {
-            let cell = emojiCollection.cellForItem(at: indexPath) as! EmojiCollectionViewCell
+            guard let cell = emojiCollection.cellForItem(at: indexPath) as? EmojiCollectionViewCell else {
+                print("Ошибка: Не удалось создать ячейку EmojiCollectionViewCell")
+                return
+            }
+            
             cell.contentView.layer.cornerRadius = 0
             cell.contentView.backgroundColor = .white
             
@@ -563,7 +580,11 @@ extension NewHabitViewController: UICollectionViewDataSource, UICollectionViewDe
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        let view = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header", for: indexPath) as! SupplementaryView
+        guard let view = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header", for: indexPath) as? SupplementaryView else {
+            print("Ошибка: Не удалось создать SupplementaryView")
+            return UICollectionReusableView()
+        }
+        
         if collectionView == emojiCollection {
             view.label.text = "Emoji"
         } else {
