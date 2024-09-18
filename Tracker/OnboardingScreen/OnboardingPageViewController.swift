@@ -9,10 +9,13 @@ import UIKit
 
 final class OnboardingPageViewController: UIViewController {
     
+    // массив хранения страниц для онбординга
     private lazy var pages: [UIViewController] = {
         let firstScreen = FirstOnboardingScreenViewController()
         let secondScreen = SecondOnboardingScreenViewController()
         return [firstScreen, secondScreen]
     }()
+    
+    
     
 }
