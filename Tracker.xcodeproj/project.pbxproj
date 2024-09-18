@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E90A470A2C9B2C4400BCA928 /* FirstOnboardingScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90A47092C9B2C4400BCA928 /* FirstOnboardingScreenViewController.swift */; };
+		E90A470C2C9B2C7100BCA928 /* SecondOnboardingScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90A470B2C9B2C7100BCA928 /* SecondOnboardingScreenViewController.swift */; };
+		E90A470E2C9B2D9A00BCA928 /* FirstSetupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90A470D2C9B2D9A00BCA928 /* FirstSetupViewController.swift */; };
+		E90A47102C9B2E4F00BCA928 /* OnboardingPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90A470F2C9B2E4F00BCA928 /* OnboardingPageViewController.swift */; };
 		E95415462BF6851D00562193 /* Tracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95415452BF6851D00562193 /* Tracker.swift */; };
 		E95415482BF685B800562193 /* TrackerCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95415472BF685B800562193 /* TrackerCategory.swift */; };
 		E954154A2BF6865E00562193 /* TrackerRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95415492BF6865E00562193 /* TrackerRecord.swift */; };
@@ -56,6 +60,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		E90A47092C9B2C4400BCA928 /* FirstOnboardingScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstOnboardingScreenViewController.swift; sourceTree = "<group>"; };
+		E90A470B2C9B2C7100BCA928 /* SecondOnboardingScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondOnboardingScreenViewController.swift; sourceTree = "<group>"; };
+		E90A470D2C9B2D9A00BCA928 /* FirstSetupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstSetupViewController.swift; sourceTree = "<group>"; };
+		E90A470F2C9B2E4F00BCA928 /* OnboardingPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPageViewController.swift; sourceTree = "<group>"; };
 		E95415452BF6851D00562193 /* Tracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tracker.swift; sourceTree = "<group>"; };
 		E95415472BF685B800562193 /* TrackerCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCategory.swift; sourceTree = "<group>"; };
 		E95415492BF6865E00562193 /* TrackerRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRecord.swift; sourceTree = "<group>"; };
@@ -116,6 +124,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E90A47082C9B2C1C00BCA928 /* OnboardingScreen */ = {
+			isa = PBXGroup;
+			children = (
+				E90A470F2C9B2E4F00BCA928 /* OnboardingPageViewController.swift */,
+				E90A47092C9B2C4400BCA928 /* FirstOnboardingScreenViewController.swift */,
+				E90A470B2C9B2C7100BCA928 /* SecondOnboardingScreenViewController.swift */,
+			);
+			path = OnboardingScreen;
+			sourceTree = "<group>";
+		};
 		E95415702BFBD59C00562193 /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
@@ -186,8 +204,10 @@
 		E9D311EC2BBDE13400F8C0E5 /* Tracker */ = {
 			isa = PBXGroup;
 			children = (
+				E90A47082C9B2C1C00BCA928 /* OnboardingScreen */,
 				E9D311ED2BBDE13400F8C0E5 /* AppDelegate.swift */,
 				E9D311EF2BBDE13400F8C0E5 /* SceneDelegate.swift */,
+				E90A470D2C9B2D9A00BCA928 /* FirstSetupViewController.swift */,
 				E9DB9D1E2C24C178005409B3 /* CoreData */,
 				E95415702BFBD59C00562193 /* ViewControllers */,
 				E9D311F62BBDE13600F8C0E5 /* Assets.xcassets */,
@@ -399,11 +419,15 @@
 				E95415762BFCC35100562193 /* EmojiCollectionViewCell.swift in Sources */,
 				E9E7A5E12C0734A500B67EB0 /* TrackerCollectionSupplementaryView.swift in Sources */,
 				E9E7A5DE2C0733D800B67EB0 /* TrackerCollectionViewCell.swift in Sources */,
+				E90A470A2C9B2C4400BCA928 /* FirstOnboardingScreenViewController.swift in Sources */,
 				E954154A2BF6865E00562193 /* TrackerRecord.swift in Sources */,
 				E9DB9CE82C245861005409B3 /* TrackersModelCoreData.xcdatamodeld in Sources */,
 				E9C43B0D2C18883500AD6BA8 /* ScheduleViewController.swift in Sources */,
 				E9DB9D1D2C24C0AE005409B3 /* TrackerRecordStore.swift in Sources */,
+				E90A47102C9B2E4F00BCA928 /* OnboardingPageViewController.swift in Sources */,
 				E9D312202BC4834300F8C0E5 /* TabBarController.swift in Sources */,
+				E90A470E2C9B2D9A00BCA928 /* FirstSetupViewController.swift in Sources */,
+				E90A470C2C9B2C7100BCA928 /* SecondOnboardingScreenViewController.swift in Sources */,
 				E9C43B082C1887DA00AD6BA8 /* CreateNewCategoryViewController.swift in Sources */,
 				E9D311F02BBDE13400F8C0E5 /* SceneDelegate.swift in Sources */,
 				E9DB9D262C2B4DE5005409B3 /* DaysValueTransformer.swift in Sources */,
